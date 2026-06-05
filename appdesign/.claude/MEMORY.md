@@ -1,0 +1,2 @@
+- [Flutter App 开发进度（至5/30）](.claude/memory/progress-2026-05-30.md) — 阶段一~七完成，Android Gradle 构建阻塞
+- [网页版开发进度（5/31）](.claude/memory/progress-2026-05-31-web.md) — desktop_web 纯 HTML/CSS/JS 版已可用

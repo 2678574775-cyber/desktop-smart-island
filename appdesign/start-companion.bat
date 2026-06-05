@@ -1,0 +1,2 @@
+@echo off
+node "C:\Users\Chengz\.claude\skills\brainstorming\scripts\server.cjs" --project-dir "D:\!program\人人卓越：桌面智能灵动岛\！APP设计"

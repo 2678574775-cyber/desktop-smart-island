@@ -1,0 +1,102 @@
+<h2>核心布局：宠物与功能的关系</h2>
+<p class="subtitle">宠物始终在场，功能自然触发</p>
+
+<div class="mockup">
+  <div class="mockup-header">主界面结构（竖屏手机）</div>
+  <div class="mockup-body" style="padding: 20px; background: linear-gradient(135deg, #FFFBF5 0%, #FEF3C7 100%); min-height: 500px; position: relative;">
+
+    <!-- 顶部状态栏 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 10px 0;">
+      <span style="font-size: 14px; color: #78716C;">📍 武汉</span>
+      <div style="display: flex; gap: 15px; align-items: center;">
+        <span style="font-size: 14px; color: #78716C;">🌤 26°C</span>
+        <span style="font-size: 14px; color: #34D399;">● 在线</span>
+      </div>
+    </div>
+
+    <!-- 中央宠物区域 -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-height: 280px; position: relative;">
+
+      <!-- 对话入口 - 宠物头部上方 -->
+      <div style="position: absolute; top: -10px; background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(249,115,22,0.15); cursor: pointer;">
+        <span style="font-size: 14px; color: #F97316;">💬 对话</span>
+      </div>
+
+      <!-- 宠物占位 -->
+      <div style="width: 180px; height: 180px; background: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(249,115,22,0.12); border: 3px solid #FED7AA;">
+        <span style="font-size: 60px;">🐕</span>
+      </div>
+      <p style="margin-top: 15px; color: #78716C; font-size: 14px;">点击头部对话 · 长按语音</p>
+
+      <!-- 任务入口 - 宠物左爪 -->
+      <div style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: white; padding: 12px 16px; border-radius: 16px; box-shadow: 0 4px 12px rgba(249,115,22,0.15); cursor: pointer;">
+        <div style="text-align: center;">
+          <span style="font-size: 20px;">📋</span>
+          <p style="font-size: 12px; color: #44403C; margin: 4px 0 0 0;">任务</p>
+          <span style="font-size: 10px; color: #F97316; background: #FEF3C7; padding: 2px 6px; border-radius: 10px;">3</span>
+        </div>
+      </div>
+
+      <!-- 番茄钟入口 - 宠物右爪 -->
+      <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: white; padding: 12px 16px; border-radius: 16px; box-shadow: 0 4px 12px rgba(249,115,22,0.15); cursor: pointer;">
+        <div style="text-align: center;">
+          <span style="font-size: 20px;">🍅</span>
+          <p style="font-size: 12px; color: #44403C; margin: 4px 0 0 0;">专注</p>
+          <span style="font-size: 10px; color: #10B981; background: #D1FAE5; padding: 2px 6px; border-radius: 10px;">25:00</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部快捷操作 -->
+    <div style="margin-top: 30px; display: flex; justify-content: space-around; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.05);">
+      <div style="text-align: center; cursor: pointer;">
+        <span style="font-size: 24px;">⚙️</span>
+        <p style="font-size: 12px; color: #78716C; margin-top: 5px;">设置</p>
+      </div>
+      <div style="text-align: center; cursor: pointer;">
+        <span style="font-size: 24px;">📊</span>
+        <p style="font-size: 12px; color: #78716C; margin-top: 5px;">统计</p>
+      </div>
+      <div style="text-align: center; cursor: pointer;">
+        <span style="font-size: 24px;">🔔</span>
+        <p style="font-size: 12px; color: #78716C; margin-top: 5px;">消息</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top: 30px;">
+  <h3>布局要点说明</h3>
+  <ul>
+    <li><strong>宠物始终居中</strong>——它是界面的锚点，其他元素围绕它浮动</li>
+    <li><strong>三个主要入口自然分布</strong>——对话在头顶（思考/交流），任务在左手（待办清单），番茄钟在右手（时间/行动）</li>
+    <li><strong>次级功能收在底部</strong>——设置、统计、消息不抢占主视觉</li>
+    <li><strong>顶部轻量状态</strong>——天气、设备状态，不过度打扰</li>
+  </ul>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="compact" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>紧凑版</h3>
+      <p>宠物稍小（150px），入口按钮更紧凑，适合小屏手机</p>
+    </div>
+  </div>
+  <div class="option" data-choice="spacious" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>舒展版</h3>
+      <p>宠物更大（220px），入口按钮用气泡形式浮在周围，更有空间感</p>
+    </div>
+  </div>
+  <div class="option" data-choice="immersive" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>沉浸版</h3>
+      <p>全屏宠物，功能入口通过"滑动/长按宠物不同部位"触发，探索感强</p>
+    </div>
+  </div>
+</div>

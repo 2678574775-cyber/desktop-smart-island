@@ -1,0 +1,26 @@
+<h2>网页版布局方案 — 三选一</h2>
+<p class="subtitle">桌面端宽屏浏览器（1920×1080 典型），对标 Flutter App 的四大模块</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>居中单栏卡片流</h3>
+      <p>960px 居中容器，上下滚动。类似 Notion / Linear 的阅读体验。宠物在顶部，下方是卡片流（指标 → 任务 → 动态）。简洁、聚焦、移动端也能看。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>左右双栏布局</h3>
+      <p><strong>左侧 380px 固定</strong>：宠物 + 设备状态 + 快捷入口（常驻可见）。<strong>右侧自适应</strong>：任务/对话/设置，Tab 切换。充分利用宽屏，宠物永远可见。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>桌面仪表盘</h3>
+      <p>全宽网格布局。宠物区、任务区、对话区、统计区全部平铺在一个屏幕上，像监控大屏。信息密度最高，但可能过于杂乱。</p>
+    </div>
+  </div>
+</div>

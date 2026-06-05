@@ -1,0 +1,94 @@
+<h2>宠物交互系统</h2>
+<p class="subtitle">所有操作都通过「和它打交道」完成</p>
+
+<div style="background: #FFF7ED; padding: 20px; border-radius: 20px; margin-bottom: 30px;">
+  <div style="display: flex; justify-content: space-around; margin-bottom: 30px; font-size: 12px;">
+    <div style="text-align: center;">
+      <span style="font-size: 36px;">👆 点击头部</span><br>
+      <span style="color: #92400E;">→ 打开文字对话页</span>
+    </div>
+    <div style="text-align: center;">
+      <span style="font-size: 36px;">🖐 长按身体</span><br>
+      <span style="color: #92400E;">→ 进入语音输入</span>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: space-around;">
+    <div style="text-align: center;">
+      <span style="font-size: 36px;">👆 点击左侧气泡 📋</span><br>
+      <span style="color: #92400E;">→ 任务管理</span>
+    </div>
+    <div style="text-align: center;">
+      <span style="font-size: 36px;">👆 点击右侧气泡 🍅</span><br>
+      <span style="color: #92400E;">→ 番茄钟/专注</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>新增问题：任务的呈现方式</h3>
+  <p><strong>在任务管理页面中，宠物应该怎么体现它的"角色"？</strong></p>
+  <p>你是希望它在侧边栏帮你提醒任务，还是让任务本身就是宠物叼着的清单？</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="pet-holds-task" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>宠物叼着清单</h3>
+      <p>每条任务都是一张小纸条，宠物用爪子（或嘴）抓着它们</p>
+      <ul>
+        <li>完成任务 = 纸条被撕掉扔进垃圾桶</li>
+        <li>待办任务越多，爪子抓得越忙</li>
+        <li>有未完成的任务时宠物会偶尔抬头看一眼</li>
+      </ul>
+      <p style="color: #F97316;">✨ 最有趣 · 情感连接最强 · 适合答辩展示</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="pet-sits-by-task" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>宠物趴在任务旁监督</h3>
+      <p>标准列表式任务 + 宠物趴在列表旁边</p>
+      <ul>
+        <li>宠物根据时间/状态有不同的表情</li>
+        <li>快到截止时间时，宠物会变得焦躁/不安</li>
+        <li>完成后宠物会摇尾巴庆祝</li>
+      </ul>
+      <p style="color: #D97706;">实用但没那么独特</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="task-pet-marks" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>中间态：宠物在旁边，任务是"便签墙"</h3>
+      <p>任务像贴在墙上的便利贴，宠物坐在墙下</p>
+      <ul>
+        <li>任务就是便利贴卡片，可翻面</li>
+        <li>宠物偶尔会"喵呜一声"提醒你某条快过期了</li>
+        <li>兼顾趣味性和实用性</li>
+      </ul>
+      <p style="color: #D97706;">平衡方案 · 推荐备选</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 25px;">
+  <h3>同时思考番茄钟中的宠物行为：</h3>
+  <div class="mockup" style="max-width: 400px;">
+    <div class="mockup-header">番茄钟界面预览</div>
+    <div class="mockup-body" style="padding: 20px; background: white; border-radius: 16px; min-height: 200px;">
+      <div style="text-align:center;margin-bottom: 15px;">
+        <div style="font-size: 36px; color: #D97706; font-weight: bold;">25:00</div>
+        <div style="font-size: 13px; color: #92400E;">专注中...</div>
+      </div>
+      <div style="height: 8px; background: #FEF3C7; border-radius: 4px; overflow: hidden;">
+        <div style="width: 60%; height: 100%; background: linear-gradient(90deg, #FBBF24, #F97316); border-radius: 4px;"></div>
+      </div>
+      <div style="text-align: center; margin-top: 15px; font-size: 40px;">🐕</div>
+      <div style="text-align: center; font-size: 12px; color: #78716C;">安静陪着你</div>
+    </div>
+  </div>
+</div>

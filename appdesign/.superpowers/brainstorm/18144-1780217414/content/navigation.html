@@ -1,0 +1,50 @@
+<h2>右侧面板导航方式</h2>
+<p class="subtitle">左侧固定栏（宠物+状态）不变，右侧如何切换四个模块？</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 A：顶部 Tab 栏</div>
+    <div class="mockup-body">
+      <div class="mock-nav" style="border-bottom:3px solid #F97316;">🏠 主页 &nbsp; 📋 任务 &nbsp; 💬 对话 &nbsp; ⚙️ 设置</div>
+      <div style="padding:16px;">
+        <div class="placeholder" style="height:60px;">当前页面内容区</div>
+        <div class="placeholder" style="height:200px; margin-top:8px;">卡片 / 列表 / 表单<br>可滚动</div>
+      </div>
+      <div style="padding:4px 16px 12px; font-size:12px; color:#A8A29E;">类似浏览器标签页，点击切换，内容区独立滚动</div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">方案 B：左侧面板内快捷入口</div>
+    <div class="mockup-body">
+      <div style="display:flex; height:300px;">
+        <div class="mock-sidebar" style="width:80px; text-align:center;">
+          <div style="padding:8px; background:#FEF3C7; border-radius:8px; margin:4px 0;">🏠<br><small>主页</small></div>
+          <div style="padding:8px; margin:4px 0;">📋<br><small>任务</small></div>
+          <div style="padding:8px; margin:4px 0;">💬<br><small>对话</small></div>
+          <div style="padding:8px; margin:4px 0;">⚙️<br><small>设置</small></div>
+        </div>
+        <div class="mock-content" style="flex:1; padding:16px;">
+          <div class="placeholder" style="height:100%;">内容区</div>
+        </div>
+      </div>
+      <div style="padding:4px 16px 12px; font-size:12px; color:#A8A29E;">左侧宠物栏下方显示快捷入口，点击切换</div>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:24px;">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>顶部 Tab 栏（推荐）</h3>
+      <p>右侧面板顶部横排 Tab，与网页习惯一致。左侧栏单纯展示宠物+状态，不承担导航职责。切换动画用 CSS transition 滑入。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>左侧面板快捷入口</h3>
+      <p>左侧宠物下方放 4 个图标按钮，点击切换右侧内容。适合把左侧栏做成"控制中心"。</p>
+    </div>
+  </div>
+</div>
