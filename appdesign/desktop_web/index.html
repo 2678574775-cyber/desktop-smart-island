@@ -211,29 +211,20 @@
           <div class="section">
             <h3 class="section-title">连接</h3>
             <div class="settings-list">
-              <!-- MQTT Broker 配置 -->
               <div class="settings-item" style="flex-wrap:wrap;gap:6px;">
-                <span style="min-width:80px;">Broker</span>
-                <input type="text" class="inline-input" id="mqttBrokerHost" placeholder="broker.emqx.io" style="flex:1;min-width:140px;font-size:13px;">
+                <span style="min-width:70px;">Broker</span>
+                <input type="text" class="inline-input" id="mqttBrokerHost" placeholder="localhost" style="flex:1;min-width:140px;font-size:13px;">
                 <span style="font-size:12px;color:var(--text-tertiary);">:</span>
-                <input type="number" class="inline-input" id="mqttBrokerPort" placeholder="8083" value="8083" style="width:64px;font-size:13px;">
-                <button class="btn-text" onclick="MqttConnect()" style="font-size:12px;white-space:nowrap;">连接</button>
+                <input type="number" class="inline-input" id="mqttBrokerPort" placeholder="8083" style="width:64px;font-size:13px;">
+                <button class="btn-text" onclick="saveBrokerAndReconnect()" style="font-size:12px;white-space:nowrap;">应用</button>
               </div>
               <div class="settings-item">
                 <span>MQTT 状态</span>
-                <span class="si-value" id="mqttStatusDisplay" style="font-size:13px;">⚪ 未连接</span>
+                <span class="si-value" id="mqttStatusDisplay" style="font-size:13px;">⏳ 等待连接...</span>
               </div>
-              <!-- 设备发现 -->
               <div class="settings-item">
-                <span>🐕 寻找机器狗</span>
-                <button class="btn btn-primary btn-sm" id="btnScanDevice" onclick="startDeviceScan()" style="padding:4px 12px;font-size:12px;">🔍 扫描</button>
-              </div>
-              <!-- 已发现设备列表（动态填充） -->
-              <div id="discoveredDeviceList" style="display:none;"></div>
-              <!-- 当前绑定的设备 -->
-              <div class="settings-item">
-                <span>当前设备</span>
-                <span class="si-value" id="boundDeviceDisplay" style="font-size:13px;color:var(--text-tertiary);">未绑定</span>
+                <span>设备状态</span>
+                <span class="si-value" id="deviceOnlineDisplay" style="font-size:13px;color:var(--text-tertiary);">等待 ESP32 上报...</span>
               </div>
             </div>
           </div>
@@ -423,7 +414,16 @@
 
   </div><!-- /app-main -->
 
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <!-- MQTT 库：优先用 unpkg，备选 jsdelivr（国内可用） -->
+  <script src="https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js">
+  </script>
+  <script>
+    // 如果 CDN 加载失败，fallback 提示
+    if (typeof mqtt === 'undefined') {
+      console.error('[MQTT] mqtt.js 加载失败，请检查网络');
+      // 后续 mqtt.js 内部会降级为模拟模式
+    }
+  </script>
   <script src="js/mqtt.js"></script>
   <script src="js/data.js"></script>
   <script src="js/tools.js"></script>

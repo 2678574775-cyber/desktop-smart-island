@@ -11,3 +11,38 @@ __pycache__/
 *.pyc
 .next/
 coverage/
+
+# 编译产物
+.pio/
+*.o
+*.bin
+*.elf
+*.hex
+
+# Adobe 自动保存
+Adobe Premiere Pro Auto-Save/
+Adobe Premiere Pro Audio Previews/
+
+# 系统
+Thumbs.db
+desktop.ini
+
+# 隐私
+*secrets*
+*api_key*
+*API_KEY*
+config.h.backup
+.claude/settings.local.json
+
+# 大文件
+*.rar
+*.zip
+*.step
+*.STEP
+*.stp
+*.f3d
+*.eprj_backup
+*.prproj
+*.prin
+*.cfa
+*.pek

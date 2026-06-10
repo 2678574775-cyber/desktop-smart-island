@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Move-Item *)",
+      "PowerShell(pio run *)",
+      "PowerShell(& \"$env:USERPROFILE\\\\.platformio\\\\penv\\\\Scripts\\\\pio.exe\" run 2>&1)",
+      "WebSearch",
+      "PowerShell(Rename-Item *)",
+      "PowerShell(& \"$env:USERPROFILE\\\\.platformio\\\\penv\\\\Scripts\\\\pio.exe\" run -e test_buttons 2>&1)",
+      "PowerShell(New-Item *)",
+      "PowerShell(git *)"
+    ]
+  }
+}

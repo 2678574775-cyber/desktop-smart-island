@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<title>桌面智能灵动岛 — 答辩流程图集（修正版）</title>
+<style>
+  :root {
+    --bg: #1A1A2E; --card: #25253D; --accent: #00D2FF; --white: #FFFFFF;
+    --gray: #AAAAAA; --green: #2ECC71; --orange: #FF9F43; --red: #FF6B6B;
+    --purple: #A855F7; --yellow: #FBBF24; --blue: #3B82F6;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--white); font-family:'Microsoft YaHei','PingFang SC',sans-serif; padding:40px 60px; }
+  h1 { text-align:center; color:var(--accent); font-size:36px; margin-bottom:8px; }
+  .subtitle { text-align:center; color:var(--gray); font-size:16px; margin-bottom:50px; }
+  .sec { margin-bottom:60px; break-inside:avoid; }
+  .sec-title { font-size:24px; color:var(--accent); border-left:4px solid var(--accent); padding-left:16px; margin-bottom:8px; }
+  .sec-note { font-size:14px; color:var(--gray); margin-bottom:20px; margin-left:20px; }
+
+  .row { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+  .box { background:var(--card); border-radius:10px; padding:16px 24px; text-align:center; min-width:120px; }
+  .box.bd-accent { border:2px solid var(--accent); }
+  .box.bd-green  { border:2px solid var(--green); }
+  .box.bd-orange { border:2px solid var(--orange); }
+  .box.bd-red    { border:2px solid var(--red); }
+  .box.bd-purple { border:2px solid var(--purple); }
+  .box.bd-gray   { border:2px solid var(--gray); }
+  .box-title { font-size:16px; font-weight:bold; margin-bottom:4px; }
+  .box-desc { font-size:12px; color:var(--gray); }
+
+  .group { background:var(--card); border-radius:12px; padding:20px; margin:8px 0; }
+  .group-title { font-size:14px; color:var(--gray); margin-bottom:12px; text-align:center; }
+
+  .flow-row { display:flex; align-items:center; justify-content:center; gap:12px; margin:12px 0; flex-wrap:wrap; }
+  .flow-box { background:var(--card); border:1.5px solid var(--accent); border-radius:8px; padding:10px 18px; text-align:center; font-size:14px; }
+  .flow-box.green { border-color:var(--green); } .flow-box.orange { border-color:var(--orange); }
+  .flow-box.red { border-color:var(--red); } .flow-box.purple { border-color:var(--purple); }
+  .flow-box.yellow { border-color:var(--yellow); }
+  .flow-arrow { color:var(--accent); font-size:20px; font-weight:bold; }
+  .flow-down { color:var(--accent); font-size:20px; text-align:center; margin:4px 0; }
+  .flow-label { font-size:11px; color:var(--gray); text-align:center; }
+
+  table { width:100%; border-collapse:collapse; font-size:14px; margin:12px 0; }
+  th { background:var(--accent); color:var(--bg); padding:8px 12px; text-align:left; }
+  td { padding:8px 12px; border-bottom:1px solid var(--card); }
+  tr:nth-child(even) td { background:rgba(37,37,61,0.5); }
+  .hl { color:var(--accent); font-weight:bold; }
+  .hlg { color:var(--green); font-weight:bold; }
+
+  .two-col { display:flex; gap:24px; flex-wrap:wrap; }
+  .two-col > div { flex:1; min-width:350px; }
+  .info-card { background:var(--card); border-radius:10px; padding:20px; margin:12px 0; }
+  .info-card h4 { color:var(--accent); margin-bottom:10px; }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:bold; }
+  .tag.green { background:rgba(46,204,113,0.2); color:var(--green); }
+  .tag.orange { background:rgba(255,159,67,0.2); color:var(--orange); }
+  .tag.red { background:rgba(255,107,107,0.2); color:var(--red); }
+  .tag.accent { background:rgba(0,210,255,0.2); color:var(--accent); }
+
+  hr { border:none; border-top:1px solid rgba(255,255,255,0.1); margin:30px 0; }
+
+  .arch-col { display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .state-box { background:var(--card); border:2px solid var(--accent); border-radius:10px; padding:12px 20px; text-align:center; min-width:130px; }
+  .state-box.active { border-color:var(--green); background:rgba(46,204,113,0.1); }
+  .state-box.sub { border-color:var(--purple); }
+  .state-name { font-size:16px; font-weight:bold; }
+  .state-desc { font-size:12px; color:var(--gray); margin-top:2px; }
+
+  @media print { body { padding:20px; } .sec { break-inside:avoid; } }
+</style>
+</head>
+<body>
+
+<h1>桌面智能灵动岛</h1>
+<p class="subtitle">答辩流程图集（修正版 — 与实际代码一致）</p>
+
+<!-- ====== 一、系统总架构 ====== -->
+<div class="sec">
+  <div class="sec-title">一、系统总架构</div>
+  <div class="sec-note">云端层 → PC 端 → ESP32 设备层</div>
+
+  <div class="group">
+    <div class="group-title">☁ 云端服务</div>
+    <div class="row">
+      <div class="box bd-purple">
+        <div class="box-title">智谱 AI</div>
+        <div class="box-desc">GLM-4-Flash + ASR + TTS</div>
+      </div>
+      <div class="box bd-orange">
+        <div class="box-title">DeepSeek API</div>
+        <div class="box-desc">Web Agent 对话</div>
+      </div>
+      <div class="box bd-accent">
+        <div class="box-title">Cloudflare Worker</div>
+        <div class="box-desc">搜索代理 + ASR 代理</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:8px 0;font-size:13px;color:var(--accent);">
+    HTTPS ↓ (智谱 ASR/AI/TTS + DeepSeek) &emsp; HTTPS ↓ (Cloudflare Worker)
+  </div>
+
+  <div class="group">
+    <div class="group-title">🖥 PC 端 (localhost)</div>
+    <div class="row">
+      <div class="box bd-green" style="min-width:200px;">
+        <div class="box-title">Web 控制面板 (SPA)</div>
+        <div class="box-desc">左栏宠物视频 + 右栏 4 Tab<br>DeepSeek Agent · 8 工具</div>
+      </div>
+      <div class="flow-arrow">MQTT ↔</div>
+      <div class="box bd-orange" style="min-width:140px;">
+        <div class="box-title">Mosquitto</div>
+        <div class="box-desc">MQTT Broker<br>TCP 1883 · WS 8083</div>
+      </div>
+      <div class="flow-arrow">MQTT ↔</div>
+      <div class="box bd-purple" style="min-width:140px;">
+        <div class="box-title">Flutter App</div>
+        <div class="box-desc">骨架 25%<br>全 Mock 数据</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:8px 0;font-size:13px;color:var(--green);">
+    MQTT (WiFi) ↓
+  </div>
+
+  <div class="group">
+    <div class="group-title">📟 ESP32-C3 SuperMini</div>
+    <div class="row">
+      <div class="box bd-accent">0.96" OLED<br><small>SSD1306 I2C</small></div>
+      <div class="box bd-green">INMP441<br><small>I2S 麦克风</small></div>
+      <div class="box bd-orange">MAX98357A<br><small>I2S 数字功放</small></div>
+      <div class="box bd-purple">4 按键<br><small>GPIO1-4</small></div>
+      <div class="box bd-red">TP4056<br><small>锂电池充电</small></div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 二、语音交互全链路 ====== -->
+<div class="sec">
+  <div class="sec-title">二、语音交互全链路（智谱全家桶）</div>
+  <div class="sec-note">ESP32 长按 A → ASR → AI → TTS → 播放</div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <div class="flow-box green">🎤 长按按键 A (1s)<br><small>OLED: "聆听中..."</small></div>
+    <div class="flow-down">▼ 最长 3s 录音</div>
+
+    <div class="flow-box orange" style="min-width:400px;">
+      INMP441 I2S 录音<br>
+      <small>16kHz · 32bit RX 模式 (24bit 有效) · mic_hal.cpp 24→16bit 转换</small>
+    </div>
+    <div class="flow-down">▼ HTTP POST (PCM, 流式 base64)</div>
+
+    <div class="flow-box purple">🗣 智谱 GLM-ASR-2512 语音识别<br><small>asr_service.cpp · 流式上传</small></div>
+    <div class="flow-down">▼ 识别文字</div>
+
+    <div class="flow-box" style="min-width:400px;">
+      🤖 智谱 GLM-4-Flash AI 对话<br>
+      <small>ai_service.cpp · 回复文本 + 40 行对话历史缓存</small>
+    </div>
+    <div class="flow-down">▼ 回复文字</div>
+
+    <div style="display:flex;gap:20px;">
+      <div class="flow-box green">📺 OLED 显示回复<br><small>B/C 键翻页浏览</small></div>
+      <div class="flow-box orange">🔊 智谱 glm-tts 语音合成<br><small>HTTP 流 → I2S TX → MAX98357A → 喇叭</small></div>
+    </div>
+    <div class="flow-label">全程延迟: ~3-5s | 全部走智谱 API | 无需百度密钥</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 三、Web Agent 对话流程 ====== -->
+<div class="sec">
+  <div class="sec-title">三、Web AI Agent 对话流程（DeepSeek）</div>
+  <div class="sec-note">agent.js · think → tool_call → observe 循环推理</div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <div class="flow-box green">💬 用户在 Web 面板输入消息</div>
+    <div class="flow-down">▼ Agent.run()</div>
+
+    <div class="flow-box purple" style="min-width:450px;">
+      🧠 think — DeepSeek API + Soul 人设 + Memory 记忆
+    </div>
+    <div class="flow-down">▼ 判断是否需要调用工具</div>
+
+    <div style="display:flex;gap:40px;">
+      <div style="text-align:center;">
+        <div class="flow-label" style="font-weight:bold;color:var(--orange);">需要工具</div>
+        <div class="flow-down" style="color:var(--orange);">▼</div>
+        <div class="flow-box orange">🔧 tool_call<br><small>调用 8 个工具之一</small></div>
+        <div class="flow-down" style="color:var(--orange);">▼</div>
+        <div class="flow-box" style="min-width:200px;">👁 observe<br><small>工具结果注入上下文</small></div>
+        <div class="flow-down">▼ 回到 think 继续推理</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="flow-label" style="font-weight:bold;color:var(--green);">无需工具</div>
+        <div class="flow-down" style="color:var(--green);">▼</div>
+        <div class="flow-box green">💬 respond<br><small>最终回复 + MQTT → ESP32 OLED</small></div>
+      </div>
+    </div>
+
+    <div class="info-card" style="max-width:700px;margin-top:12px;">
+      <h4>8 个 Function Calling 工具</h4>
+      <div class="row" style="gap:8px;">
+        <span class="tag green">createTask</span> <span class="tag green">updateTask</span>
+        <span class="tag green">deleteTask</span> <span class="tag green">listTasks</span>
+        <span class="tag green">toggleTask</span> <span class="tag orange">getDDLSummary</span>
+        <span class="tag orange">getWeather</span> <span class="tag purple">webSearch</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray);margin-top:8px;">
+        webSearch 通过 Cloudflare Worker 中转 DuckDuckGo
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 四、MQTT 通信协议 ====== -->
+<div class="sec">
+  <div class="sec-title">四、MQTT 通信协议（本地 Mosquitto）</div>
+  <div class="sec-note">Broker: Mosquitto (PC 端) · TCP 1883 + WebSocket 8083 · 三端主题一致</div>
+
+  <table>
+    <tr><th>MQTT 主题</th><th>方向</th><th>说明</th></tr>
+    <tr><td class="hl">desk/island/status</td><td>ESP32 → Web</td><td>设备状态: online / battery / state / pomodoro_remain / wifi_rssi / version / uptime</td></tr>
+    <tr><td class="hl">desk/island/display</td><td>Web → ESP32</td><td>OLED 通知弹窗: text / duration</td></tr>
+    <tr><td class="hl">desk/island/cmd</td><td>Web → ESP32</td><td>控制: switch_mode / set_brightness / screen_off / screen_on</td></tr>
+    <tr><td class="hl">desk/island/task/add</td><td>Web → ESP32</td><td>新增任务: id / title / priority / deadline</td></tr>
+    <tr><td class="hl">desk/island/task/done</td><td>双向</td><td>标记任务完成: task_id / done</td></tr>
+    <tr><td class="hl">desk/island/pomodoro</td><td>Web → ESP32</td><td>远程番茄钟: start / pause / resume / reset + duration_min</td></tr>
+    <tr><td class="hl">desk/island/chat</td><td>Web → ESP32</td><td>AI 回复推送到 OLED 对话历史: content</td></tr>
+    <tr><td class="hl">desk/island/voice/input</td><td>ESP32 → Web</td><td>ASR 识别文本转发给 Web Agent: text</td></tr>
+  </table>
+  <div style="text-align:center;font-size:12px;color:var(--gray);margin-top:8px;">
+    三端一致: ESP32 config.h · Web mqtt.js · Flutter mqtt_service.dart
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 五、GPIO 引脚分配 ====== -->
+<div class="sec">
+  <div class="sec-title">五、GPIO 引脚分配（依据 config.h 实际代码）</div>
+  <div class="sec-note">11 个可用 GPIO 全部用完 · GPIO11=Flash · GPIO21=USB CDC</div>
+
+  <table>
+    <tr><th>GPIO</th><th>分配功能</th><th>连接对象</th><th>方向</th><th>备注</th></tr>
+    <tr><td class="hlg">GPIO0</td><td>电池 ADC 检测</td><td>分压电路 → ADC1_CH0</td><td>IN</td><td>原按键 E，GPIO 硬件损坏改为 ADC</td></tr>
+    <tr><td class="hlg">GPIO1</td><td>按键 D</td><td>轻触开关 (模式切换中枢)</td><td>IN</td><td>短按切模式 / 双击配对 / 长按进设置</td></tr>
+    <tr><td class="hlg">GPIO2</td><td>按键 A</td><td>轻触开关 (方向/录音)</td><td>IN</td><td>⚠ Strapping，用 INPUT 而非 INPUT_PULLUP</td></tr>
+    <tr><td class="hlg">GPIO3</td><td>按键 C</td><td>轻触开关 (确认/开始)</td><td>IN</td><td>INPUT_PULLUP</td></tr>
+    <tr><td class="hlg">GPIO4</td><td>按键 B</td><td>轻触开关 (暂停/返回)</td><td>IN</td><td>INPUT_PULLUP</td></tr>
+    <tr><td class="hl">GPIO5</td><td>I2S BCLK</td><td>INMP441 SCK + MAX98357A BCLK</td><td>OUT</td><td>INMP441 与 MAX98357A 共用</td></tr>
+    <tr><td class="hl">GPIO6</td><td>I2S LRC</td><td>INMP441 WS + MAX98357A LRC</td><td>OUT</td><td>INMP441 与 MAX98357A 共用</td></tr>
+    <tr><td class="hl">GPIO7</td><td>I2S DIN</td><td>MAX98357A DIN (音频数据)</td><td>OUT</td><td>ESP32 → 功放</td></tr>
+    <tr><td class="hl">GPIO8</td><td>I2C SDA</td><td>OLED SDA</td><td>I/O</td><td>—</td></tr>
+    <tr><td class="hl">GPIO9</td><td>I2C SCL</td><td>OLED SCL</td><td>OUT</td><td>—</td></tr>
+    <tr><td class="hl">GPIO10</td><td>I2S DOUT</td><td>INMP441 SD (麦克风数据)</td><td>IN</td><td>INMP441 → ESP32</td></tr>
+    <tr><td class="hl">GPIO20</td><td>AMP_SD</td><td>MAX98357A SD (关断控制)</td><td>OUT</td><td>LOW=关断，HIGH=正常工作</td></tr>
+  </table>
+  <div class="info-card" style="margin-top:12px;">
+    <span class="tag red">⚠ 设计 vs 实际差异</span>
+    原设计 GPIO4=I2S_WS → 实际 GPIO4=按键B &nbsp;|&nbsp;
+    原设计 5-6 键 74HC138D → 实际 4 键直连 &nbsp;|&nbsp;
+    GPIO0 硬件损坏 → 改为电池 ADC
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 六、I2S 总线共用 ====== -->
+<div class="sec">
+  <div class="sec-title">六、I2S 总线共用方案</div>
+  <div class="sec-note">INMP441 + MAX98357A 共用 BCLK/LRC · 软件 RX/TX 动态切换 · 互斥工作</div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <div class="box bd-green" style="min-width:280px;">
+      <div class="box-title">ESP32-C3 SuperMini (I2S Controller)</div>
+    </div>
+
+    <div style="display:flex;gap:40px;margin-top:12px;">
+      <div class="arch-col">
+        <div style="color:var(--accent);font-weight:bold;font-size:13px;">BCLK (GPIO5)</div>
+        <div style="display:flex;gap:16px;">
+          <div class="box bd-orange"><div class="box-title">INMP441</div><div class="box-desc">SCK 引脚</div></div>
+          <div class="box bd-green"><div class="box-title">MAX98357A</div><div class="box-desc">BCLK 引脚</div></div>
+        </div>
+      </div>
+      <div class="arch-col">
+        <div style="color:var(--orange);font-weight:bold;font-size:13px;">LRC (GPIO6)</div>
+        <div style="display:flex;gap:16px;">
+          <div class="box bd-orange"><div class="box-title">INMP441</div><div class="box-desc">WS 引脚</div></div>
+          <div class="box bd-green"><div class="box-title">MAX98357A</div><div class="box-desc">LRC 引脚</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:40px;margin-top:16px;">
+      <div class="arch-col">
+        <div style="color:var(--red);font-weight:bold;font-size:13px;">DOUT ← IN (GPIO10)</div>
+        <div class="flow-down" style="color:var(--red);">▼</div>
+        <div class="box bd-red"><div class="box-title">INMP441 SD</div><div class="box-desc">麦克风 → ESP32 (RX)</div></div>
+      </div>
+      <div class="arch-col">
+        <div style="color:var(--green);font-weight:bold;font-size:13px;">DIN → OUT (GPIO7)</div>
+        <div class="flow-down" style="color:var(--green);">▼</div>
+        <div class="box bd-green"><div class="box-title">MAX98357A DIN</div><div class="box-desc">ESP32 → 功放 → 喇叭 (TX)</div></div>
+      </div>
+    </div>
+
+    <div class="arch-col" style="margin-top:12px;">
+      <div style="color:var(--purple);font-weight:bold;font-size:13px;">AMP_SD (GPIO20)</div>
+      <div class="flow-down" style="color:var(--purple);">▼</div>
+      <div class="box bd-purple"><div class="box-title">MAX98357A SD</div><div class="box-desc">LOW=关断 (录音时) · HIGH=正常 (播放时)</div></div>
+    </div>
+
+    <div class="info-card" style="max-width:750px;margin-top:16px;">
+      <span class="tag red">⚠ 互斥约束</span>
+      同一条 BCLK/LRC 并联到 INMP441 + MAX98357A<br>
+      I2S 同一时刻只能配置为 RX 或 TX：<br>
+      &nbsp;&nbsp;• 录音: i2sInitRecord() 配置 RX → GPIO20 LOW 关断功放防自激啸叫<br>
+      &nbsp;&nbsp;• 播放: i2sDeinit() → i2sInitPlay() 配置 TX → GPIO20 HIGH 开功放<br>
+      &nbsp;&nbsp;• 录音 32bit 模式 (INMP441 24bit 置高24位) · 播放 16bit 模式<br>
+      &nbsp;&nbsp;• 功放 VIN 接电池 3.7V 直供 (峰值 0.5A, 不走 LDO)
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 七、按键体系 & 电源 ====== -->
+<div class="sec">
+  <div class="sec-title">七、按键体系 & 电源架构</div>
+  <div class="sec-note">4 键直连 GPIO（非设计中 74HC138D 6 键方案）</div>
+
+  <div class="two-col">
+    <div class="group">
+      <div class="group-title">按键设计 (button_hal.cpp)</div>
+      <table>
+        <tr><th>按键</th><th>GPIO</th><th>连接方式</th><th>支持事件</th><th>全局角色</th></tr>
+        <tr><td class="hlg">A</td><td class="hlg">GPIO2</td><td>INPUT (Strapping)</td><td>短按 / 长按(1s)</td><td>方向 / 语音录音</td></tr>
+        <tr><td class="hlg">B</td><td class="hlg">GPIO4</td><td>INPUT_PULLUP</td><td>短按 / 双击(500ms)</td><td>暂停 / 返回</td></tr>
+        <tr><td class="hlg">C</td><td class="hlg">GPIO3</td><td>INPUT_PULLUP</td><td>短按</td><td>确认 / 开始</td></tr>
+        <tr><td class="hlg">D</td><td class="hlg">GPIO1</td><td>INPUT_PULLUP</td><td>短按/双击/长按(2s)</td><td>模式切换中枢</td></tr>
+      </table>
+      <div style="font-size:12px;color:var(--gray);margin-top:8px;">
+        <b>去抖</b>: 主循环 1kHz 轮询 · 8 次同值确认 ≈ 8ms · 响应延迟 &lt; 12ms<br>
+        <b>上拉</b>: 全用 ESP32 内部 INPUT_PULLUP (~45kΩ), 省掉外部 10kΩ 电阻
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="group">
+        <div class="group-title">电源架构</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;">
+          <div class="box bd-accent">USB 5V → TP4056 充电模块</div>
+          <div class="flow-down">▼</div>
+          <div class="box bd-green">14250 锂电池 (3.7V 300mAh)</div>
+          <div style="display:flex;gap:40px;margin-top:8px;">
+            <div class="arch-col">
+              <div style="color:var(--orange);font-size:12px;">3.7V 直供 (大电流)</div>
+              <div class="box bd-orange">MAX98357A VIN<br><small>峰值 0.5A</small></div>
+            </div>
+            <div class="arch-col">
+              <div style="color:var(--green);font-size:12px;">AMS1117 LDO → 3.3V</div>
+              <div class="box bd-green">ESP32 + OLED + INMP441<br><small>合计 ~100mA</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">电池 ADC (batt_hal.cpp)</div>
+        <div style="text-align:center;font-size:13px;color:var(--accent);">
+          V_bat ─┬─ R1 (100kΩ) ─┬─→ GPIO0 (ADC1_CH0)<br>
+          &emsp;&emsp;&emsp; └─ R2 (100kΩ) ─┘<br><br>
+          V_adc = V_bat × 0.5<br>
+          8 次采样取平均 → 滤波 → 映射 3.3V-4.2V → 0-100%<br>
+          10s 读取间隔 (BATT_READ_MS)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 八、固件分层架构 & 状态机 ====== -->
+<div class="sec">
+  <div class="sec-title">八、ESP32 固件架构 & 6 模式状态机</div>
+  <div class="sec-note">39 文件 ~3,500 行 · 分层设计 · 上层依赖下层 · 同层不互依赖</div>
+
+  <div class="two-col">
+    <div class="group" style="font-size:12px;">
+      <div class="group-title">分层依赖关系</div>
+      <div style="text-align:center;">
+        <div class="box bd-accent" style="display:inline-block;">main.cpp (应用控制器)<br><small>enterMode / cycleMode / checkTimeout / renderCurrentMode</small></div>
+        <div class="flow-down">▼</div>
+        <div class="row">
+          <div class="box bd-green" style="min-width:150px;">modes/ (6 模式)<br><small>每个 = render + handleButtons</small></div>
+        </div>
+        <div class="flow-down">▼</div>
+        <div class="row" style="gap:8px;">
+          <div class="box bd-purple" style="min-width:120px;">services/<br><small>WiFi/NTP/ASR<br>AI/TTS/MQTT</small></div>
+          <div class="box bd-orange" style="min-width:120px;">ui/<br><small>状态栏/图标<br>开机动画</small></div>
+          <div class="box bd-red" style="min-width:120px;">hardware/<br><small>按键/显示/麦克风<br>电池/功放/I2S</small></div>
+        </div>
+        <div class="flow-down">▼</div>
+        <div class="box" style="display:inline-block;">config.h (全局数据源 — 引脚/枚举/extern)</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="group">
+        <div class="group-title">6 种应用模式</div>
+        <table style="font-size:12px;">
+          <tr><th>模式</th><th>枚举</th><th>定位</th><th>核心功能</th></tr>
+          <tr><td class="hlg">CHAT-ROBOT</td><td>0</td><td>默认中枢</td><td>A 长按录音→ASR→AI→TTS→回复, B/C 翻页</td></tr>
+          <tr><td>CLOCK</td><td>1</td><td>大字时钟</td><td>HH:MM 闪烁冒号 + 日期星期 + 摘要</td></tr>
+          <tr><td>COUNTDOWN</td><td>2</td><td>番茄钟</td><td>A/B ±5min 连按加速, C 开始/B 暂停/BB 取消</td></tr>
+          <tr><td>TODO</td><td>3</td><td>待办任务</td><td>LIST/DETAIL 两态, MQTT 驱动, A 标完成回传</td></tr>
+          <tr><td>WEATHER</td><td>4</td><td>天气</td><td>TODAY+FORECAST 两页 (硬编码)</td></tr>
+          <tr><td>SETTINGS</td><td>5</td><td>系统设置</td><td>7 项: WiFi/亮度(NVS持久化)/睡眠/AI模式</td></tr>
+        </table>
+      </div>
+
+      <div class="group" style="font-size:12px;">
+        <div class="group-title">模式切换规则</div>
+        D 键短按循环: CHAT-ROBOT → CLOCK → TODO → COUNTDOWN → WEATHER → 回<br>
+        D 键双击配对: CLOCK↔WEATHER · TODO↔COUNTDOWN<br>
+        D 键长按 2s: 进 SETTINGS (按 B 退出回 CHAT-ROBOT)<br>
+        30s 无操作 → 自动回 CHAT-ROBOT (COUNTDOWN 运行中除外)
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 九、Web 面板 ====== -->
+<div class="sec">
+  <div class="sec-title">九、Web 控制面板设计</div>
+  <div class="sec-note">8 文件 ~3,200 行 · SPA · 左宠物视频 + 右 4 Tab</div>
+
+  <div class="two-col">
+    <div class="group">
+      <div class="group-title">页面布局 (index.html + style.css)</div>
+      <table style="font-size:12px;">
+        <tr><th>区域</th><th>尺寸</th><th>内容</th></tr>
+        <tr><td>全局顶部栏</td><td>100%</td><td>标题 · 天气 26°C · 设备状态 ●在线</td></tr>
+        <tr><td class="hlg">左侧固定</td><td class="hlg">380px</td><td>宠物视频 (MP4 ×3) · 状态标签 · 三指标卡(任务/番茄/电量) · 设备信息</td></tr>
+        <tr><td>右侧自适应</td><td>flex:1</td><td>Tab 栏 + 内容区 (主页/任务/对话/设置)</td></tr>
+      </table>
+      <div style="font-size:12px;color:var(--gray);margin-top:8px;">
+        3 个宠物视频自动切换: 空闲→开心(pet_happy.mp4) · AI思考→思考(pet_thinking.mp4) · 休眠→睡觉(pet_sleeping.mp4)
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">4 Tab 功能矩阵</div>
+      <table style="font-size:12px;">
+        <tr><th>Tab</th><th>核心功能</th><th>设备联动</th></tr>
+        <tr><td>🏠 主页</td><td>设备状态 · 快捷入口 · 任务概览</td><td>接收 status 上报</td></tr>
+        <tr><td>📋 任务</td><td>CRUD · 筛选 · 标记完成</td><td>MQTT 推 ESP32 + 回传同步</td></tr>
+        <tr><td>💬 对话</td><td>DeepSeek Agent · 文字输入</td><td>回复推 OLED · ASR 文本接收</td></tr>
+        <tr><td>⚙ 设置</td><td>设备绑定 · 功能开关 · 关于</td><td>cmd 指令下发</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 十、Flutter App ====== -->
+<div class="sec">
+  <div class="sec-title">十、Flutter App 骨架（25% 完成度）</div>
+  <div class="sec-note">25 文件 ~2,500 行 · Dart · Provider · Material 3 · 落地受限</div>
+
+  <div class="two-col">
+    <div class="group">
+      <div class="group-title">✅ 已完成</div>
+      <div style="font-size:13px;line-height:1.8;">
+        <span class="tag green">UI</span> 4 Tab + 开幕动画 + 弹窗 (页面结构齐全)<br>
+        <span class="tag green">Model</span> DeviceState / Task / ChatMessage 3 数据模型<br>
+        <span class="tag green">Provider</span> Device / Task / Chat (ChangeNotifier)<br>
+        <span class="tag green">Screen</span> 6 页面: 开幕/主页/任务/对话/设置 + 主框架<br>
+        <span class="tag green">Widget</span> 5 组件: 宠物视频/对话气泡/任务卡片/指标卡/日总结<br>
+        <span class="tag green">Service</span> MQTT 完整 + mDNS 设备发现<br>
+        <span class="tag green">Mock</span> 3 套 Mock 数据使 UI 可展示
+      </div>
+    </div>
+    <div class="group">
+      <div class="group-title">❌ 未完成</div>
+      <div style="font-size:13px;line-height:1.8;">
+        <span class="tag red">数据</span> 所有 Provider 初始化读 Mock 文件<br>
+        <span class="tag red">MQTT</span> 连接代码完整但未与 ESP32 联调<br>
+        <span class="tag red">mDNS</span> 设备发现代码完整但未测试<br>
+        <span class="tag red">Agent</span> 未对接 Cloudflare Worker 或 DeepSeek
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 十一、技术难点 ====== -->
+<div class="sec">
+  <div class="sec-title">十一、关键技术难点与解决方案</div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div class="row">
+      <div class="box bd-red" style="min-width:280px;text-align:left;">
+        <div class="box-title" style="color:var(--red);">ESP32-C3 无 DAC</div>
+        <div style="font-size:12px;color:var(--gray);">无法接模拟功放 (PAM8403)</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="box bd-green" style="min-width:500px;text-align:left;">
+        <div class="box-title" style="color:var(--green);">选型 MAX98357A I2S 数字功放</div>
+        <div style="font-size:12px;color:var(--gray);">纯数字输入 · 与 INMP441 共用 BCLK/LRC · 软件 i2sInitRecord/i2sInitPlay 动态切换 · 效率 92%</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box bd-red" style="min-width:280px;text-align:left;">
+        <div class="box-title" style="color:var(--red);">麦克风与功放冲突</div>
+        <div style="font-size:12px;color:var(--gray);">共用 I2S 总线不能同时收发</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="box bd-green" style="min-width:500px;text-align:left;">
+        <div class="box-title" style="color:var(--green);">GPIO20 控制功放关断 + 软件互斥</div>
+        <div style="font-size:12px;color:var(--gray);">录音前 GPIO20 LOW 关断防自激 · I2S 先卸载再重新初始化反向 · 录音 32bit / 播放 16bit</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box bd-red" style="min-width:280px;text-align:left;">
+        <div class="box-title" style="color:var(--red);">GPIO 资源紧缺</div>
+        <div style="font-size:12px;color:var(--gray);">仅 11 可用 IO · GPIO0 硬件损坏</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="box bd-green" style="min-width:500px;text-align:left;">
+        <div class="box-title" style="color:var(--green);">4 键直连 + INPUT_PULLUP 省电阻 + ADC 测电量</div>
+        <div style="font-size:12px;color:var(--gray);">GPIO0 损坏→改为电池 ADC · 按键全用内部上拉 · 功放 SD 用 GPIO20 控制 · 原设计 6 键 74HC138D 方案因 GPIO0 损坏而搁置</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box bd-red" style="min-width:280px;text-align:left;">
+        <div class="box-title" style="color:var(--red);">ESP32-C3 RAM 有限</div>
+        <div style="font-size:12px;color:var(--gray);">~400KB SRAM</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="box bd-green" style="min-width:500px;text-align:left;">
+        <div class="box-title" style="color:var(--green);">模块化加载 + 录音 buffer 限制</div>
+        <div style="font-size:12px;color:var(--gray);">按需初始化 · 录音限 3s · config.h 统一管理全局状态避免重复分配 · 软件 WDT 防死锁</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box bd-red" style="min-width:280px;text-align:left;">
+        <div class="box-title" style="color:var(--red);">答辩现场网络风险</div>
+        <div style="font-size:12px;color:var(--gray);">WiFi 不稳 / API 超额</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="box bd-green" style="min-width:500px;text-align:left;">
+        <div class="box-title" style="color:var(--green);">本地 Mosquitto + PC 热点 + API 备份</div>
+        <div style="font-size:12px;color:var(--gray);">MQTT 不走外网 · PC 热点方案 · 智谱 API 多 Key 备份 · 预设回复兜底</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ====== 十二、技术栈与代码量 ====== -->
+<div class="sec">
+  <div class="sec-title">十二、代码量统计 & 技术栈总览</div>
+
+  <table>
+    <tr><th>模块</th><th style="text-align:center;">文件数</th><th style="text-align:center;">代码行数</th><th>技术栈</th></tr>
+    <tr><td class="hlg">ESP32 固件</td><td style="text-align:center;" class="hlg">39</td><td style="text-align:center;" class="hlg">~3,500</td><td>C/C++ · PlatformIO · Arduino · I2S · I2C · WiFi · MQTT · NTP</td></tr>
+    <tr><td>Web 前端 JS</td><td style="text-align:center;">5</td><td style="text-align:center;">~2,200</td><td>JavaScript ES6 · Fetch · MQTT.js · SPA</td></tr>
+    <tr><td>Web HTML + CSS</td><td style="text-align:center;">2</td><td style="text-align:center;">~1,200</td><td>HTML5 · CSS3 · Flexbox · CSS 变量暖光主题</td></tr>
+    <tr><td>Cloudflare Worker</td><td style="text-align:center;">1</td><td style="text-align:center;">~230</td><td>JavaScript · DuckDuckGo 搜索代理 · ASR 代理</td></tr>
+    <tr><td>Flutter App</td><td style="text-align:center;">25</td><td style="text-align:center;">~2,500</td><td>Dart · Provider · Material 3 · MQTT · mDNS</td></tr>
+    <tr style="font-weight:bold;border-top:2px solid var(--accent);"><td>合计</td><td style="text-align:center;">72</td><td style="text-align:center;">~9,630</td><td>5 种语言 · 3 座代码仓库</td></tr>
+  </table>
+
+  <div class="row" style="margin-top:16px;gap:8px;">
+    <div class="box bd-green" style="flex:1;">
+      <div class="box-title">硬件</div>
+      <div class="box-desc">ESP32-C3 · SSD1306 · INMP441 · MAX98357A<br>TP4056 · 14250 电池 · 4 按键</div>
+    </div>
+    <div class="box bd-purple" style="flex:1;">
+      <div class="box-title">AI</div>
+      <div class="box-desc">智谱 GLM-4-Flash + ASR + TTS<br>DeepSeek API (Web Agent)</div>
+    </div>
+    <div class="box bd-orange" style="flex:1;">
+      <div class="box-title">通信</div>
+      <div class="box-desc">本地 Mosquitto MQTT<br>TCP 1883 + WebSocket 8083</div>
+    </div>
+    <div class="box bd-accent" style="flex:1;">
+      <div class="box-title">后端</div>
+      <div class="box-desc">Cloudflare Worker<br>搜索代理 + ASR 代理</div>
+    </div>
+    <div class="box bd-gray" style="flex:1;">
+      <div class="box-title">设计</div>
+      <div class="box-desc">嘉立创 EDA · Premiere Pro<br>Flutter · CSS 暖光主题</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -79,7 +79,7 @@ extern const int cdPresets[CD_PRESET_COUNT];
 
 // 智谱 API
 #ifndef ZHIPU_API_KEY
-#define ZHIPU_API_KEY "8cf4d9d3507046dd95b104843a463f1e.OmlclcM3GQPzPYEH"
+#define ZHIPU_API_KEY "YOUR_ZHIPU_API_KEY"  // 请替换为你的API Key
 #endif
 
 // ── 枚举 ──

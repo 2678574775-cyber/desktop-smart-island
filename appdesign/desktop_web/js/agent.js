@@ -30,7 +30,7 @@ const DEFAULT_SOUL = `你是桌面智能灵动岛的AI助手，名叫「小岛�
 - 操作完任务后，简短告知用户结果即可，不要啰嗦`;
 
 // ===================== Agent 默认 API Key（演示用） =====================
-const DEFAULT_API_KEY = 'sk-dc9c01854cd544a4b3d83a01211e22d4';
+const DEFAULT_API_KEY = 'YOUR_DEEPSEEK_API_KEY';  // 请替换为你的API Key
 
 // ===================== Agent 设置管理 =====================
 const AgentSettings = {
@@ -65,6 +65,7 @@ const AgentSettings = {
   get soul()       { return this.load().soul || DEFAULT_SOUL; },
   get compactAt()  { return parseInt(this.load().compactAt) || 8; },
   get workerUrl()  { return this.load().workerUrl || ''; },
+};
 
 // ===================== Memory 管理 =====================
 const MemoryStore = {

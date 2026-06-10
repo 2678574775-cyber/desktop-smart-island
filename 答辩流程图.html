@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>桌面智能灵动岛 — 答辩流程图集</title>
+<style>
+  :root {
+    --bg: #1A1A2E;
+    --card: #25253D;
+    --accent: #00D2FF;
+    --white: #FFFFFF;
+    --gray: #AAAAAA;
+    --green: #2ECC71;
+    --orange: #FF9F43;
+    --red: #FF6B6B;
+    --purple: #A855F7;
+    --yellow: #FBBF24;
+    --blue: #3B82F6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    padding: 40px 60px;
+  }
+  h1 {
+    text-align: center;
+    color: var(--accent);
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--gray);
+    font-size: 16px;
+    margin-bottom: 50px;
+  }
+  .diagram-section {
+    margin-bottom: 60px;
+    break-inside: avoid;
+  }
+  .diagram-title {
+    font-size: 24px;
+    color: var(--accent);
+    border-left: 4px solid var(--accent);
+    padding-left: 16px;
+    margin-bottom: 16px;
+  }
+  .diagram-note {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+
+  /* ── 架构图通用 ── */
+  .arch-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .arch-box {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .arch-box.small { min-width: 90px; padding: 10px 14px; }
+  .arch-box.cloud { border-color: var(--blue); }
+  .arch-box.esp   { border-color: var(--green); }
+  .arch-box.app   { border-color: var(--orange); }
+  .arch-box.gray  { border-color: var(--gray); }
+  .arch-box-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+  .arch-box-desc  { font-size: 12px; color: var(--gray); }
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--accent);
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .arch-label {
+    font-size: 11px;
+    color: var(--accent);
+    text-align: center;
+    margin: 2px 0;
+  }
+  .arch-group {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 8px 0;
+  }
+  .arch-group-title {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .arch-column { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+
+  /* ── 流程图 ── */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    background: var(--card);
+    border: 1.5px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .flow-box.green  { border-color: var(--green); }
+  .flow-box.orange { border-color: var(--orange); }
+  .flow-box.red    { border-color: var(--red); }
+  .flow-box.purple { border-color: var(--purple); }
+  .flow-box.yellow { border-color: var(--yellow); }
+  .flow-arrow {
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .flow-arrow-down {
+    color: var(--accent);
+    font-size: 20px;
+    text-align: center;
+    margin: 4px 0;
+  }
+  .flow-label {
+    font-size: 11px;
+    color: var(--gray);
+    text-align: center;
+  }
+
+  /* ── 表格 ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 12px 0;
+  }
+  th {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--card);
+  }
+  tr:nth-child(even) td { background: rgba(37,37,61,0.5); }
+  .highlight { color: var(--accent); font-weight: bold; }
+
+  /* ── 状态机 ── */
+  .state-machine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .state-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .state-box {
+    background: var(--card);
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .state-box.active { border-color: var(--green); background: rgba(46,204,113,0.1); }
+  .state-box.sub   { border-color: var(--purple); }
+  .state-name { font-size: 16px; font-weight: bold; }
+  .state-desc { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* ── 双列布局 ── */
+  .two-col {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .two-col > div { flex: 1; min-width: 350px; }
+
+  /* ── 卡片 ── */
+  .info-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 12px 0;
+  }
+  .info-card h4 { color: var(--accent); margin-bottom: 10px; }
+
+  /* ── 标签 ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .tag.green  { background: rgba(46,204,113,0.2); color: var(--green); }
+  .tag.orange { background: rgba(255,159,67,0.2); color: var(--orange); }
+  .tag.red    { background: rgba(255,107,107,0.2); color: var(--red); }
+  .tag.accent { background: rgba(0,210,255,0.2); color: var(--accent); }
+
+  hr { border: none; border-top: 1px solid var(--card); margin: 30px 0; }
+
+  @media print {
+    body { padding: 20px; }
+    .diagram-section { break-inside: avoid; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>桌面智能灵动岛</h1>
+<p class="subtitle">答辩流程图集 — 可直接截图插入PPT</p>
+
+<!-- ============================================================ -->
+<!-- P6: 系统总架构 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">一、系统总架构</div>
+  <div class="diagram-note">对应 PPT 第 6 页</div>
+
+  <!-- 云端层 -->
+  <div class="arch-group">
+    <div class="arch-group-title">☁ 云端服务</div>
+    <div class="arch-row">
+      <div class="arch-box cloud">
+        <div class="arch-box-title">智谱 AI</div>
+        <div class="arch-box-desc">GLM-4-Flash</div>
+      </div>
+      <div class="arch-box cloud">
+        <div class="arch-box-title">百度 ASR</div>
+        <div class="arch-box-desc">语音识别</div>
+      </div>
+      <div class="arch-box cloud">
+        <div class="arch-box-title">百度 TTS</div>
+        <div class="arch-box-desc">语音合成</div>
+      </div>
+      <div class="arch-box cloud">
+        <div class="arch-box-title">和风天气</div>
+        <div class="arch-box-desc">Weather API</div>
+      </div>
+      <div class="arch-box cloud">
+        <div class="arch-box-title">EMQX</div>
+        <div class="arch-box-desc">MQTT Broker</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 箭头 -->
+  <div style="text-align:center; margin:8px 0;">
+    <span style="color:var(--accent); font-size:14px;">HTTPS (AI/ASR/TTS/天气) ↓ &nbsp;&nbsp;&nbsp; MQTT/WebSocket ↓</span>
+  </div>
+
+  <!-- 局域网层 -->
+  <div class="arch-group">
+    <div class="arch-group-title">📶 WiFi 局域网</div>
+    <div class="arch-row">
+      <!-- ESP32 -->
+      <div class="arch-box esp" style="min-width:280px;">
+        <div class="arch-box-title">ESP32-C3 Super Mini</div>
+        <div class="arch-box-desc" style="text-align:left; margin-top:8px;">
+          ├ 0.96" OLED (SSD1306 I2C)<br>
+          ├ INMP441 麦克风 (I2S)<br>
+          ├ MAX98357A 功放 (I2S)<br>
+          ├ 74HC138D × 6 按键<br>
+          └ TP4056 锂电池充电
+        </div>
+      </div>
+
+      <div class="arch-arrow">⟷ MQTT ⟷</div>
+
+      <!-- 手机/PC -->
+      <div class="arch-box app" style="min-width:280px;">
+        <div class="arch-box-title">手机 / PC</div>
+        <div class="arch-box-desc" style="text-align:left; margin-top:8px;">
+          ├ 📱 微信小程序 (5 Tab)<br>
+          │&nbsp;&nbsp; ├ 设备页 · 任务页<br>
+          │&nbsp;&nbsp; ├ AI对话 · 番茄钟<br>
+          │&nbsp;&nbsp; └ 我的 (配网/设置)<br>
+          └ 🖥 PC Ollama (备用AI)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- P7: 语音全链路 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">二、语音交互全链路</div>
+  <div class="diagram-note">对应 PPT 第 7、14 页</div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+    <!-- 第1行：触发 -->
+    <div class="flow-box green">🎤 长按按键 C<br><small>OLED: "聆听中..."</small></div>
+    <div class="flow-arrow-down">▼ 松开 C (最长 5s)</div>
+
+    <!-- 第2行：录音 -->
+    <div class="flow-box orange" style="min-width:400px;">
+      INMP441 I2S 录音<br>
+      <small>16kHz · 16bit · PCM · ~160KB buffer</small>
+    </div>
+    <div class="flow-arrow-down">▼ HTTP POST (PCM)</div>
+
+    <!-- 第3行：ASR -->
+    <div class="flow-box">🗣 百度语音识别 ASR<br><small>免费 5万次/天 · 返回识别文字</small></div>
+    <div class="flow-arrow-down">▼</div>
+
+    <!-- 第4行：AI -->
+    <div class="flow-box purple" style="min-width:400px;">
+      🤖 AI 对话 (双模)<br>
+      <small>☁ 智谱 GLM-4-Flash (云端 1~3s) &nbsp;|&nbsp; 🏠 Ollama qwen2.5 (本地 2~5s)</small>
+    </div>
+    <div class="flow-arrow-down">▼</div>
+
+    <!-- 第5行：输出 -->
+    <div style="display:flex; gap:20px;">
+      <div class="flow-box green">📺 OLED 显示回复<br><small>E/F 键滚动翻页</small></div>
+      <div class="flow-box orange">🔊 TTS 语音播报<br><small>百度TTS → MAX98357A → 喇叭</small></div>
+    </div>
+    <div class="flow-label">全程延迟：云端 ~2s | 本地 ~4s</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- 任务同步 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">三、MQTT 任务同步流程</div>
+  <div class="diagram-note">对应 PPT 第 7、17 页</div>
+
+  <div class="two-col">
+    <div class="info-card">
+      <h4>📋 任务同步</h4>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-box orange">📱 小程序<br>创建任务</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">MQTT<br><small>device/{id}/task/add</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box green">ESP32<br>OLED 弹通知</div>
+      </div>
+      <div style="text-align:center; margin:16px 0;"><span class="flow-arrow">↕ 双向同步 ↕</span></div>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-box green">ESP32<br>TODO 模式浏览</div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box">MQTT<br><small>device/{id}/task/done</small></div>
+        <span class="flow-arrow">←</span>
+        <div class="flow-box orange">📱 小程序<br>标记完成</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h4>🍅 番茄钟同步</h4>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="flow-box orange">📱 小程序<br>启动 25min</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">MQTT<br><small>pomodoro/start</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box green">ESP32<br>OLED 倒计时</div>
+      </div>
+      <div style="text-align:center; margin:12px 0; font-size:12px; color:var(--gray);">
+        ESP32 每秒上报剩余秒数 → 小程序实时进度条
+      </div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <div class="flow-box green">⏸ 暂停</div>
+        <div class="flow-box red">✕ 放弃</div>
+        <div class="flow-box yellow">⏰ 完成 → 双端通知</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- I2S 音频子系统 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">四、I2S 音频子系统</div>
+  <div class="diagram-note">对应 PPT 第 10 页 · 共享 I2S 总线</div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+    <!-- 主控 -->
+    <div class="arch-box esp" style="min-width:300px;">
+      <div class="arch-box-title">ESP32-C3 Super Mini (I2S Master)</div>
+    </div>
+
+    <!-- 分叉 -->
+    <div style="display:flex; gap:40px; align-items:flex-start; margin-top:12px;">
+      <!-- BCLK 列 -->
+      <div class="arch-column">
+        <div class="flow-label" style="color:var(--accent); font-weight:bold;">BCLK (GPIO5)</div>
+        <div style="display:flex; gap:16px;">
+          <div class="arch-box small" style="border-color:var(--orange);">
+            <div class="arch-box-title">INMP441</div>
+            <div class="arch-box-desc">SCK 引脚</div>
+          </div>
+          <div class="arch-box small" style="border-color:var(--green);">
+            <div class="arch-box-title">MAX98357A</div>
+            <div class="arch-box-desc">BCLK 引脚</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LRC 列 -->
+      <div class="arch-column">
+        <div class="flow-label" style="color:var(--orange); font-weight:bold;">LRC (GPIO4)</div>
+        <div style="display:flex; gap:16px;">
+          <div class="arch-box small" style="border-color:var(--orange);">
+            <div class="arch-box-title">INMP441</div>
+            <div class="arch-box-desc">WS 引脚</div>
+          </div>
+          <div class="arch-box small" style="border-color:var(--green);">
+            <div class="arch-box-title">MAX98357A</div>
+            <div class="arch-box-desc">LRC 引脚</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据线（分向） -->
+    <div style="display:flex; gap:40px; margin-top:16px;">
+      <div class="arch-column">
+        <div class="flow-label" style="color:var(--red); font-weight:bold;">SD (GPIO6) ← 输入</div>
+        <div class="flow-arrow-down" style="color:var(--red);">▼</div>
+        <div class="arch-box small" style="border-color:var(--red);">
+          <div class="arch-box-title">INMP441 SD</div>
+          <div class="arch-box-desc">麦克风 → ESP32</div>
+        </div>
+      </div>
+      <div class="arch-column">
+        <div class="flow-label" style="color:var(--green); font-weight:bold;">DIN (GPIO10) → 输出</div>
+        <div class="flow-arrow-down" style="color:var(--green);">▼</div>
+        <div class="arch-box small" style="border-color:var(--green);">
+          <div class="arch-box-title">MAX98357A DIN</div>
+          <div class="arch-box-desc">ESP32 → 功放 → 喇叭</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card" style="margin-top:20px; max-width:700px;">
+      <span class="tag red">⚠ 关键</span>
+      同一条 BCLK/LRC 接两根线→INMP441+MAX98357A 并联<br>
+      SD 和 DIN 是不同的数据方向，不冲突<br>
+      MAX98357A 供电接电池 3.7V (不走 LDO，峰值电流 0.5A)
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- 74HC138 按键 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">五、74HC138D 按键矩阵</div>
+  <div class="diagram-note">对应 PPT 第 11 页 · 4 脚 → 6 键</div>
+
+  <div class="two-col">
+    <div class="arch-group">
+      <div class="arch-group-title">74HC138D (3-8 译码器)</div>
+      <table>
+        <tr><th>74HC138 引脚</th><th>连接</th><th>说明</th></tr>
+        <tr><td>A (1脚)</td><td class="highlight">GPIO0</td><td>地址 LSB</td></tr>
+        <tr><td>B (2脚)</td><td class="highlight">GPIO1</td><td>地址</td></tr>
+        <tr><td>C (3脚)</td><td class="highlight">GPIO2</td><td>地址 MSB</td></tr>
+        <tr><td>G2A (4脚)</td><td>GND</td><td>使能 低有效</td></tr>
+        <tr><td>G2B (5脚)</td><td>GND</td><td>使能 低有效</td></tr>
+        <tr><td>G1 (6脚)</td><td>+3V3</td><td>使能 高有效</td></tr>
+        <tr><td>VCC (16脚)</td><td>+3V3</td><td>供电</td></tr>
+        <tr><td>GND (8脚)</td><td>GND</td><td>地</td></tr>
+      </table>
+    </div>
+
+    <div class="arch-group">
+      <div class="arch-group-title">按键接线 & 扫描</div>
+      <table>
+        <tr><th>Y 输出</th><th>按键</th><th>地址 CBA</th><th>功能</th></tr>
+        <tr><td>Y0 (15脚)</td><td>SW1</td><td>000</td><td>模式切换</td></tr>
+        <tr><td>Y1 (14脚)</td><td>SW2</td><td>001</td><td>音量+</td></tr>
+        <tr><td>Y2 (13脚)</td><td>SW3</td><td>010</td><td>音量-</td></tr>
+        <tr><td>Y3 (12脚)</td><td>SW4</td><td>011</td><td>播放/暂停</td></tr>
+        <tr><td>Y4 (11脚)</td><td>SW5</td><td>100</td><td>上一曲</td></tr>
+        <tr><td>Y5 (10脚)</td><td>SW6</td><td>101</td><td>下一曲</td></tr>
+      </table>
+      <div style="margin-top:12px; text-align:center;">
+        <span class="tag accent">KEY_IN (GPIO3)</span>
+        ← 6 按键公共端 + 10kΩ 上拉 +3V3<br>
+        <small style="color:var(--gray);">0=按下 &nbsp; 1=未按</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card" style="margin-top:12px;">
+    <h4>扫描逻辑（伪代码）</h4>
+    <code style="color:var(--accent); font-size:13px;">
+      for (int i = 0; i < 6; i++) {<br>
+      &nbsp;&nbsp;GPIO0 = i & 1; &nbsp; GPIO1 = i & 2; &nbsp; GPIO2 = i & 4; &nbsp; // 地址<br>
+      &nbsp;&nbsp;delay_us(10); &nbsp; // 等待 74HC138 稳定<br>
+      &nbsp;&nbsp;if (!GPIO3) return i; &nbsp; // 按键 i 被按下<br>
+      }<br>
+      return -1; // 无按键
+    </code>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- 固件状态机 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">六、嵌入式固件状态机</div>
+  <div class="diagram-note">对应 PPT 第 12 页 · 6 核心模式</div>
+
+  <div class="state-machine">
+    <!-- 中枢 -->
+    <div class="state-box active" style="min-width:250px;">
+      <div class="state-name">🤖 CHAT-ROBOT (默认中枢)</div>
+      <div class="state-desc">开机进入 · 超时返回 · 表情包</div>
+    </div>
+
+    <div style="display:flex; gap:8px; align-items:center;">
+      <span class="flow-arrow-down">▼ 按键 B 循环切换 ▼</span>
+    </div>
+
+    <!-- 4个子模式 -->
+    <div class="state-row">
+      <div class="state-box">
+        <div class="state-name">🕐 CLOCK</div>
+        <div class="state-desc">时钟 · 天气摘要</div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">⏳ COUNTDOWN</div>
+        <div class="state-desc">番茄钟倒计时</div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">📋 TODO</div>
+        <div class="state-desc">任务列表 · 详情</div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">🌤 WEATHER</div>
+        <div class="state-desc">天气 · 预报</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; margin-top:12px;">
+      <div class="state-box sub" style="min-width:180px;">
+        <div class="state-name">⚙ SETTINGS</div>
+        <div class="state-desc">长按 C 进入 · B 退出</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; font-size:12px; color:var(--gray); text-align:center;">
+      循环顺序：CHAT-ROBOT → CLOCK → COUNTDOWN → TODO → WEATHER → CHAT-ROBOT<br>
+      倒计时运行中不触发超时返回 · SETTINGS 不在循环中，单独进入/退出
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- AI 双模切换 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">七、AI 双模切换策略</div>
+  <div class="diagram-note">对应 PPT 第 15 页 · 云端优先 → 本地兜底</div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+    <div class="flow-box yellow">💬 用户提问</div>
+    <div class="flow-arrow-down">▼</div>
+    <div class="flow-box" style="min-width:200px;">检测智谱 API 连通性？</div>
+    <div style="display:flex; gap:80px;">
+      <div style="text-align:center;">
+        <div class="flow-label" style="font-weight:bold; color:var(--green);">✓ 可达</div>
+        <div class="flow-arrow-down" style="color:var(--green);">▼</div>
+        <div class="flow-box green" style="min-width:180px;">
+          ☁ 云端模式<br>
+          <small>智谱 GLM-4-Flash (免费)<br>延迟 1~3s</small>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div class="flow-label" style="font-weight:bold; color:var(--red);">✕ 不可达</div>
+        <div class="flow-arrow-down" style="color:var(--red);">▼</div>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div class="flow-box" style="min-width:200px;">扫描局域网 Ollama？</div>
+          <div style="display:flex; gap:40px; margin-top:8px;">
+            <div style="text-align:center;">
+              <div class="flow-label" style="font-weight:bold; color:var(--green);">✓ 在线</div>
+              <div class="flow-arrow-down" style="color:var(--green);">▼</div>
+              <div class="flow-box orange" style="min-width:150px;">
+                🏠 本地模式<br>
+                <small>Ollama qwen2.5 0.5B<br>延迟 2~5s</small>
+              </div>
+            </div>
+            <div style="text-align:center;">
+              <div class="flow-label" style="font-weight:bold; color:var(--red);">✕ 离线</div>
+              <div class="flow-arrow-down" style="color:var(--red);">▼</div>
+              <div class="flow-box red" style="min-width:150px;">
+                📋 降级模式<br>
+                <small>预设回复<br>"AI暂时不可用"</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-card" style="max-width:500px; margin-top:12px;">
+      <span class="tag green">答辩优势</span>
+      WiFi 不稳时一键切 PC 热点 + Ollama 本地，不受影响<br>
+      OLED 状态栏实时显示 ☁ / 🏠 图标
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- 微信小程序架构 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">八、微信小程序设计</div>
+  <div class="diagram-note">对应 PPT 第 16 页 · 5 Tab 页面 + MQTT 通信</div>
+
+  <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:24px;">
+
+    <!-- Tab 1: 设备页 -->
+    <div style="flex:1; min-width:200px; max-width:220px; background:var(--card); border-radius:10px; overflow:hidden; border-top:3px solid var(--accent);">
+      <div style="background:var(--accent); color:var(--bg); text-align:center; padding:8px; font-weight:bold; font-size:15px;">📡 设备页</div>
+      <div style="padding:12px; font-size:13px; line-height:1.8;">
+        <div style="color:var(--gray); font-size:11px; margin-bottom:4px;">首页 · 设备状态总览</div>
+        <div>● 在线 / 离线状态</div>
+        <div>● 电池电量 / WiFi信号</div>
+        <div>● 设备运行时长</div>
+        <div>● 当前运行中卡片</div>
+        <div style="border-top:1px solid var(--card); margin-top:8px; padding-top:8px;">
+          <span style="color:var(--accent); font-size:12px;">快捷入口宫格 (2×3)</span><br>
+          语音输入 | 任务管理<br>
+          AI对话 | 番茄钟<br>
+          今日天气 | 设备设置
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: 任务页 -->
+    <div style="flex:1; min-width:200px; max-width:220px; background:var(--card); border-radius:10px; overflow:hidden; border-top:3px solid var(--green);">
+      <div style="background:var(--green); color:var(--bg); text-align:center; padding:8px; font-weight:bold; font-size:15px;">📋 任务页</div>
+      <div style="padding:12px; font-size:13px; line-height:1.8;">
+        <div style="color:var(--gray); font-size:11px; margin-bottom:4px;">Todo CRUD</div>
+        <div>● 创建 / 编辑任务</div>
+        <div>● 筛选 (全部/待办/已完成)</div>
+        <div>● 标记完成 / 取消完成</div>
+        <div>● 同步状态 🟢🟡🔴</div>
+        <div style="border-top:1px solid var(--card); margin-top:8px; padding-top:8px;">
+          <span style="color:var(--gray); font-size:12px;">进度统计条<br>40% ████░░░░░░</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: AI 对话页 -->
+    <div style="flex:1; min-width:200px; max-width:220px; background:var(--card); border-radius:10px; overflow:hidden; border-top:3px solid var(--purple);">
+      <div style="background:var(--purple); color:var(--bg); text-align:center; padding:8px; font-weight:bold; font-size:15px;">🤖 AI 对话页</div>
+      <div style="padding:12px; font-size:13px; line-height:1.8;">
+        <div style="color:var(--gray); font-size:11px; margin-bottom:4px;">AI 文字/语音对话</div>
+        <div>● ☁ 云端 / 🏠 本地切换</div>
+        <div>● 文字输入 + 发送</div>
+        <div>● 语音输入 (微信录音)</div>
+        <div>● AI 回复气泡展示</div>
+        <div style="border-top:1px solid var(--card); margin-top:8px; padding-top:8px;">
+          <span style="color:var(--accent); font-size:12px;">[推送到设备] 按钮</span><br>
+          <span style="color:var(--gray); font-size:12px;">历史记录 50 条</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: 番茄钟页 -->
+    <div style="flex:1; min-width:200px; max-width:220px; background:var(--card); border-radius:10px; overflow:hidden; border-top:3px solid var(--orange);">
+      <div style="background:var(--orange); color:var(--bg); text-align:center; padding:8px; font-weight:bold; font-size:15px;">🍅 番茄钟页</div>
+      <div style="padding:12px; font-size:13px; line-height:1.8;">
+        <div style="color:var(--gray); font-size:11px; margin-bottom:4px;">远程控制 + 统计</div>
+        <div>● 远程启动 / 暂停 / 放弃</div>
+        <div>● 时长调节 (±5分钟)</div>
+        <div>● 快速预设 (15/25/45)</div>
+        <div>● 关联任务</div>
+        <div style="border-top:1px solid var(--card); margin-top:8px; padding-top:8px;">
+          <span style="color:var(--gray); font-size:12px;">7 日统计柱状图<br>一 ████ 二 ██████</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: 我的页 -->
+    <div style="flex:1; min-width:200px; max-width:220px; background:var(--card); border-radius:10px; overflow:hidden; border-top:3px solid var(--gray);">
+      <div style="background:#555; color:var(--white); text-align:center; padding:8px; font-weight:bold; font-size:15px;">⚙ 我的页</div>
+      <div style="padding:12px; font-size:13px; line-height:1.8;">
+        <div style="color:var(--gray); font-size:11px; margin-bottom:4px;">设置</div>
+        <div>● 设备绑定 / 解绑</div>
+        <div>● WiFi 配网</div>
+        <div>● MQTT 连接状态</div>
+        <div>● 消息推送开关</div>
+        <div style="border-top:1px solid var(--card); margin-top:8px; padding-top:8px;">
+          <span style="color:var(--gray); font-size:12px;">AI 模式选择<br>使用帮助 · 检查更新</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部通信栏 -->
+  <div class="arch-group">
+    <div class="arch-group-title">MQTT 通信层</div>
+    <div class="arch-row">
+      <div class="arch-box cloud">
+        <div class="arch-box-title">EMQX Cloud</div>
+        <div class="arch-box-desc">MQTT Broker (免费版)</div>
+      </div>
+    </div>
+    <table style="margin-top:12px; font-size:13px;">
+      <tr><th>MQTT 主题</th><th>方向</th><th>说明</th></tr>
+      <tr><td class="highlight">device/{id}/status</td><td>ESP32 → 小程序</td><td>设备在线状态 / 电量 / 当前模式</td></tr>
+      <tr><td class="highlight">device/{id}/task/add</td><td>小程序 → ESP32</td><td>新增任务</td></tr>
+      <tr><td class="highlight">device/{id}/task/done</td><td>小程序 ⇄ ESP32</td><td>标记完成 / 取消完成</td></tr>
+      <tr><td class="highlight">device/{id}/pomodoro/start</td><td>小程序 → ESP32</td><td>远程启动番茄钟</td></tr>
+      <tr><td class="highlight">device/{id}/pomodoro/status</td><td>ESP32 → 小程序</td><td>番茄钟进度 (每秒上报)</td></tr>
+      <tr><td class="highlight">device/{id}/message</td><td>小程序 → ESP32</td><td>AI 回复推送到 OLED 显示</td></tr>
+    </table>
+    <div style="text-align:center; margin-top:8px; font-size:12px; color:var(--gray);">
+      数据格式: JSON &nbsp;|&nbsp; QoS 1 &nbsp;|&nbsp; 支持 WebSocket (小程序直连)
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 引脚分配 -->
+<!-- ============================================================ -->
+<div class="diagram-section">
+  <div class="diagram-title">九、GPIO 引脚分配总表</div>
+  <div class="diagram-note">对应 PPT 第 9 页 · ESP32-C3 Super Mini</div>
+
+  <table>
+    <tr><th>GPIO</th><th>网络标签</th><th>连接器件</th><th>方向</th><th>说明</th></tr>
+    <tr><td>GPIO0</td><td class="highlight">KEY_A</td><td>74HC138D A 脚</td><td>OUT</td><td>按键地址 LSB</td></tr>
+    <tr><td>GPIO1</td><td class="highlight">KEY_B</td><td>74HC138D B 脚</td><td>OUT</td><td>按键地址</td></tr>
+    <tr><td>GPIO2</td><td class="highlight">KEY_C</td><td>74HC138D C 脚</td><td>OUT</td><td>按键地址 MSB</td></tr>
+    <tr><td>GPIO3</td><td class="highlight">KEY_IN</td><td>6 按键公共端 (10kΩ 上拉)</td><td>IN</td><td>按键读回线</td></tr>
+    <tr><td>GPIO4</td><td class="highlight">I2S_WS</td><td>INMP441 + MAX98357A</td><td>OUT</td><td>I2S 帧时钟 (LRC)</td></tr>
+    <tr><td>GPIO5</td><td class="highlight">I2S_SCK</td><td>INMP441 + MAX98357A</td><td>OUT</td><td>I2S 位时钟 (BCLK)</td></tr>
+    <tr><td>GPIO6</td><td class="highlight">I2S_SD</td><td>INMP441 SD</td><td>IN</td><td>麦克风数据输入</td></tr>
+    <tr><td>GPIO7</td><td class="highlight">I2S_DOUT</td><td>MAX98357A DIN</td><td>OUT</td><td>音频数据 → 功放</td></tr>
+    <tr><td>GPIO8</td><td class="highlight">I2C_SDA</td><td>OLED1 SDA</td><td>I/O</td><td>I2C 数据</td></tr>
+    <tr><td>GPIO9</td><td class="highlight">I2C_SCL</td><td>OLED1 SCL</td><td>OUT</td><td>I2C 时钟</td></tr>
+    <tr><td>GPIO10</td><td class="highlight">LED_STATUS</td><td>LED1 (220Ω → GND)</td><td>OUT</td><td>状态指示灯</td></tr>
+    <tr><td>5V</td><td class="highlight">VBAT</td><td>TP4056 BAT+</td><td>PWR</td><td>电池供电 3.7V</td></tr>
+    <tr><td>3V3</td><td class="highlight">+3V3</td><td>OLED/INMP441/74HC138</td><td>PWR</td><td>LDO 3.3V 输出</td></tr>
+    <tr><td>GND</td><td class="highlight">GND</td><td>全部器件</td><td>PWR</td><td>公共地</td></tr>
+  </table>
+  <div style="text-align:center; margin-top:8px; font-size:13px; color:var(--gray);">
+    GPIO 占用: 11/16 · 剩余: GPIO20/21 (USB串口)
+  </div>
+</div>
+
+</body>
+</html>

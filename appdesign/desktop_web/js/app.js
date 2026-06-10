@@ -86,14 +86,12 @@ function switchPetVideo(mood) {
 // ===================== 初始化入口 =====================
 document.addEventListener('DOMContentLoaded', () => {
   AppState.init();
-  DeviceStore.init();
   initOpening();
   renderAll();
   bindEvents();
   startDDLTimer();
   startBlinkTimer();
-  initMqttUI();
-  initMqttListeners();
+  initMqttAuto();
 });
 
 /** 全量渲染 */
@@ -1028,269 +1026,49 @@ const VoiceInput = {
   },
 };
 
-// ===================== MQTT + 设备发现 =====================
+// ===================== MQTT =====================
 
-/** 初始化 MQTT 相关的 UI 控件 */
-function initMqttUI() {
-  // 回填 Broker 配置
-  const hostEl = $_('mqttBrokerHost');
-  const portEl = $_('mqttBrokerPort');
-  if (hostEl) hostEl.value = DeviceStore.brokerHost;
-  if (portEl) portEl.value = DeviceStore.brokerPort;
+/** 页面加载：自动连 Mosquitto，监听 ESP32 上报 */
+function initMqttAuto() {
+  var hostEl = $_('mqttBrokerHost');
+  var portEl = $_('mqttBrokerPort');
+  if (hostEl) hostEl.value = localStorage.getItem('mqtt_host') || 'localhost';
+  if (portEl) portEl.value = localStorage.getItem('mqtt_port') || '8083';
 
-  // 刷新状态显示
-  updateMqttStatusUI();
+  // 可能在代理环境下 CDN 延迟，等 1 秒再连
+  setTimeout(function() { MqttClient.autoConnect(); }, 500);
 
-  // 如果已绑定设备，显示设备信息
-  if (DeviceStore.boundDevice) {
-    updateBoundDeviceUI();
-  }
-}
+  window.addEventListener('mqtt-state', updateMqttStatusUI);
 
-/** 监听 MQTT 状态变化（从 mqtt.js 发出的全局事件） */
-function initMqttListeners() {
-  window.addEventListener('mqtt-state', (e) => {
-    updateMqttStatusUI();
-  });
-
-  // 监听 MQTT 消息：设备状态上报 → 更新 AppState
-  window.addEventListener('mqtt-message', (e) => {
-    const { topic, payload } = e.detail;
-    if (DeviceStore.boundDevice && topic === `device/${DeviceStore.boundDevice.id}/status`) {
-      // 实时更新设备状态
-      if (payload.online !== undefined) AppState.device.online = payload.online;
-      if (payload.battery !== undefined) AppState.device.battery = payload.battery;
-      if (payload.pet_mood !== undefined) AppState.device.petMood = payload.pet_mood;
-      if (payload.state !== undefined) AppState.device.state = payload.state;
-      AppState.save();
-
-      // 更新宠物视频
-      if (payload.pet_mood) {
-        switchPetVideo(payload.pet_mood);
-      }
-
-      // 刷新 UI
-      renderSidebar();
-      renderSettingsTab();
-    }
+  // ESP32 上报 desk/island/status → 实时刷新 UI
+  window.addEventListener('mqtt-message', function(e) {
+    if (e.detail.topic !== 'desk/island/status') return;
+    var p = e.detail.payload;
+    if (p.online !== undefined) AppState.device.online = p.online;
+    if (p.battery !== undefined) AppState.device.battery = p.battery;
+    if (p.pet_mood !== undefined) AppState.device.petMood = p.pet_mood;
+    if (p.state !== undefined) AppState.device.state = p.state;
+    AppState.save();
+    if (p.pet_mood) switchPetVideo(p.pet_mood);
+    renderSidebar();
+    renderSettingsTab();
   });
 }
 
-/** 连接/断开 MQTT Broker */
-async function MqttConnect() {
-  const hostEl = $_('mqttBrokerHost');
-  const portEl = $_('mqttBrokerPort');
-
-  const host = (hostEl && hostEl.value.trim()) ? hostEl.value.trim() : 'broker.emqx.io';
-  const port = (portEl && parseInt(portEl.value)) ? parseInt(portEl.value) : 8083;
-
-  // 保存配置
-  DeviceStore.brokerHost = host;
-  DeviceStore.brokerPort = port;
-  DeviceStore.saveBrokerConfig();
-
-  // 如果已连接 → 断开
-  if (MqttClient.connected) {
-    await MqttClient.disconnect();
-    updateMqttStatusUI();
-    toast('MQTT 已断开', 'info');
-    return;
-  }
-
-  toast('正在连接 MQTT...', 'info');
-  const ok = await MqttClient.connect({
-    host: host,
-    port: port,
-    deviceId: DeviceStore.boundDevice ? DeviceStore.boundDevice.id : '',
-  });
-
-  updateMqttStatusUI();
-
-  if (ok) {
-    toast('MQTT 已连接 ✅', 'success');
-
-    // 如果已绑定设备，重新订阅主题
-    if (DeviceStore.boundDevice) {
-      MqttClient.setDeviceId(DeviceStore.boundDevice.id);
-      // 订阅设备状态
-      MqttClient.subscribe(`device/${DeviceStore.boundDevice.id}/status`);
-    }
-
-    // 始终订阅发现应答
-    MqttClient.subscribe('device/+/discover/ack');
-  } else {
-    toast('MQTT 连接失败，请检查 Broker 地址', 'error');
-  }
+function saveBrokerAndReconnect() {
+  var host = ($_('mqttBrokerHost').value.trim()) || 'localhost';
+  var port = parseInt($_('mqttBrokerPort').value) || 8083;
+  MqttClient.setBroker(host, port);
+  toast('切换 Broker: ' + host + ':' + port, 'info');
 }
 
-/** 刷新 MQTT 状态文字 */
 function updateMqttStatusUI() {
-  const el = $_('mqttStatusDisplay');
-  const btn = $_('btnScanDevice');
+  var el = $_('mqttStatusDisplay');
   if (!el) return;
-
   if (MqttClient.connected) {
-    el.innerHTML = '<span style="color:var(--success);">🟢 已连接</span>';
-    el.className = 'si-value success';
+    el.innerHTML = '<span style="color:var(--success);">🟢 已连接 Mosquitto</span>';
   } else {
-    el.innerHTML = '<span style="color:var(--text-tertiary);">⚪ 未连接</span>';
-    el.className = 'si-value';
-    // 未连接时扫描按钮仍可用（会提示先连接）
+    el.innerHTML = '<span style="color:var(--text-tertiary);">⏳ 正在连接...</span>';
   }
 }
 
-/** 开始设备扫描 */
-function startDeviceScan() {
-  if (!MqttClient.connected) {
-    toast('请先连接 MQTT Broker', 'error');
-    return;
-  }
-
-  const btn = $_('btnScanDevice');
-  if (DeviceStore.isScanning) {
-    // 停止扫描
-    MqttClient.stopDiscovery();
-    DeviceStore.isScanning = false;
-    if (btn) { btn.textContent = '🔍 扫描'; btn.disabled = false; }
-    toast('扫描已停止', 'info');
-    return;
-  }
-
-  // 清空之前的设备
-  DeviceStore.discovered = [];
-  renderDiscoveredDevices();
-
-  DeviceStore.isScanning = true;
-  if (btn) { btn.textContent = '⏳ 扫描中...'; btn.disabled = true; }
-
-  toast('🔍 正在搜索机器狗...', 'info');
-
-  MqttClient.startDiscovery((devices) => {
-    DeviceStore.discovered = devices;
-    renderDiscoveredDevices();
-  });
-
-  // 5 秒后自动停止（与 mqtt.js 中的 timeout 对应）
-  setTimeout(() => {
-    if (DeviceStore.isScanning) {
-      DeviceStore.isScanning = false;
-      if (btn) { btn.textContent = '🔍 扫描'; btn.disabled = false; }
-      const count = DeviceStore.discovered.length;
-      toast(count > 0 ? `发现 ${count} 台设备 🐕` : '未发现设备，请确保机器狗已开机并联网', count > 0 ? 'success' : 'info');
-    }
-  }, 5500);
-}
-
-/** 渲染已发现的设备列表 */
-function renderDiscoveredDevices() {
-  const container = $_('discoveredDeviceList');
-  if (!container) return;
-
-  const devices = DeviceStore.discovered;
-
-  if (devices.length === 0) {
-    container.style.display = 'none';
-    return;
-  }
-
-  container.style.display = 'block';
-  container.innerHTML = devices.map(d => {
-    const isBound = DeviceStore.boundDevice && DeviceStore.boundDevice.id === d.id;
-    const batteryColor = d.battery >= 80 ? 'var(--success)' :
-                         d.battery >= 40 ? 'var(--warm-yellow)' : 'var(--danger)';
-    const moodMap = {
-      happy: '😊', listening: '👂', thinking: '🤔', sleepy: '😴', idle: '✨',
-    };
-    const moodEmoji = moodMap[d.petMood] || '🐕';
-
-    return `
-      <div class="discovered-device-card ${isBound ? 'bound' : ''}" onclick="bindToDevice('${d.id}')">
-        <div class="dd-icon">${moodEmoji}</div>
-        <div class="dd-info">
-          <div class="dd-name">${escapeHtml(d.name)} <span class="dd-id">#${escapeHtml(d.id)}</span></div>
-          <div class="dd-meta">
-            <span>🔋 <b style="color:${batteryColor};">${d.battery}%</b></span>
-            <span>📡 ${d.ip || '?'}</span>
-            <span>${d.online ? '🟢 在线' : '⚫ 离线'}</span>
-          </div>
-        </div>
-        <div class="dd-action">
-          ${isBound ? '<span class="dd-bound-badge">已绑定</span>' : '<button class="btn btn-primary btn-sm" style="padding:4px 12px;font-size:11px;">绑定</button>'}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-/** 绑定设备 */
-async function bindToDevice(deviceId) {
-  const device = DeviceStore.discovered.find(d => d.id === deviceId);
-  if (!device) return;
-
-  DeviceStore.bindDevice(device);
-  updateBoundDeviceUI();
-  renderDiscoveredDevices();
-
-  // 订阅该设备的 MQTT 主题
-  if (MqttClient.connected) {
-    MqttClient.setDeviceId(deviceId);
-    MqttClient.subscribe(`device/${deviceId}/status`);
-    MqttClient.subscribe(`device/${deviceId}/task/list`);
-    MqttClient.subscribe(`device/${deviceId}/task/done`);
-    MqttClient.subscribe(`device/${deviceId}/pomodoro/status`);
-  }
-
-  // 更新设备名
-  AppState.device.name = device.name;
-  AppState.save();
-
-  toast(`已绑定 ${device.name} 🐕`, 'success');
-  renderSidebar();
-  renderSettingsTab();
-}
-
-/** 刷新绑定设备 UI */
-function updateBoundDeviceUI() {
-  const el = $_('boundDeviceDisplay');
-  if (!el) return;
-
-  const device = DeviceStore.boundDevice;
-  if (device) {
-    el.innerHTML = `${device.name} <span style="font-size:11px;">#${device.id}</span>
-      <button class="btn-text danger" onclick="unbindDevice()" style="margin-left:8px;font-size:11px;">解绑</button>`;
-    el.style.color = 'var(--text)';
-  } else {
-    el.innerHTML = '未绑定';
-    el.style.color = 'var(--text-tertiary)';
-  }
-}
-
-/** 解绑设备 */
-function unbindDevice() {
-  if (!confirm('确定要解绑当前设备吗？')) return;
-  DeviceStore.unbindDevice();
-  updateBoundDeviceUI();
-  renderDiscoveredDevices();
-  toast('已解绑设备', 'info');
-}
-
-/** 加速页面加载时自动连接 MQTT（如果已配置且有绑定设备） */
-async function autoConnectMqtt() {
-  if (!DeviceStore.boundDevice) return; // 没绑定设备就不自动连
-  if (MqttClient.connected) return;
-
-  const ok = await MqttClient.connect({
-    host: DeviceStore.brokerHost,
-    port: DeviceStore.brokerPort,
-    deviceId: DeviceStore.boundDevice.id,
-  });
-
-  if (ok) {
-    updateMqttStatusUI();
-    MqttClient.subscribe(`device/${DeviceStore.boundDevice.id}/status`);
-    MqttClient.subscribe('device/+/discover/ack');
-  }
-}
-
-// 页面加载后 2 秒自动尝试连接
-setTimeout(() => { autoConnectMqtt(); }, 2000);

@@ -46,8 +46,8 @@
 // ================================================================
 //  WiFi & NTP 配置
 // ================================================================
-char WIFI_SSID[32] = "Xiaomi 15";
-char WIFI_PASS[32] = "12345678";
+char WIFI_SSID[32] = "";  // 请填入WiFi名称
+char WIFI_PASS[32] = "";  // 请填入WiFi密码
 const char* NTP_SERVER = "ntp.aliyun.com";
 const long   GMT_OFFSET = 8 * 3600;
 const int    DAYLIGHT   = 0;

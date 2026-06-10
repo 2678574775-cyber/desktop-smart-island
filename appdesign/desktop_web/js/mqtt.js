@@ -1,400 +1,168 @@
 /* ==========================================================
-   桌面智能灵动岛 — MQTT 客户端（WebSocket）
-   使用 mqtt.js 库，通过 EMQX WebSocket 端口连接
-   加载方式：index.html 中通过 CDN 引入 mqtt.js
+   桌面智能灵动岛 — MQTT 客户端
+   直连 Mosquitto，主题匹配 ESP32 固件的 desk/island/ 前缀
+   用法：双击 index.html 用 file:// 打开或 Live Server
    ========================================================== */
 
-const MqttClient = (() => {
-  // --- 默认配置 ---
-  const DEFAULT_BROKER = 'broker.emqx.io';
-  const DEFAULT_WS_PORT = 8083;       // EMQX WebSocket 端口
-  const DEFAULT_TCP_PORT = 1883;      // TCP 端口（仅用于显示）
-  const DISCOVER_TOPIC = 'desktoppet/discover';
+const MqttClient = (function() {
 
-  // --- 内部状态 ---
-  let _client = null;                 // mqtt.js client 实例
-  let _deviceId = '';
-  let _connected = false;
-  let _brokerUrl = '';
-  let _handlers = [];                 // [{ topic, fn }]
-  let _reconnectTimer = null;
-  let _reconnectAttempts = 0;
+  // --- 配置 ---
+  var _host = 'localhost';
+  var _port = 8083;
+  var _client = null;
+  var _connected = false;
+  var _deviceOnline = false;
 
-  // --- 公开 API ---
-  return {
-    /** 是否已连接 */
-    get connected() { return _connected; },
-
-    /** 当前设备 ID */
-    get deviceId() { return _deviceId; },
-
-    /** Broker WebSocket URL */
-    get brokerUrl() { return _brokerUrl; },
-
-    /**
-     * 连接到 MQTT Broker
-     * @param {Object} opts - { host, port, deviceId, username, password }
-     *                         port 默认 8083 (WebSocket)
-     * @returns {Promise<boolean>}
-     */
-    async connect(opts = {}) {
-      const host = opts.host || DEFAULT_BROKER;
-      const port = opts.port || DEFAULT_WS_PORT;
-      const deviceId = opts.deviceId || '';
-
-      // 如果已连接，先断开
-      if (_client) {
-        await this.disconnect();
-      }
-
-      _deviceId = deviceId;
-      _brokerUrl = `ws://${host}:${port}/mqtt`;
-      // 注意：mqtt.js 要求 ws:// 或 wss:// 协议
-      const wsUrl = port === 8084 || port === 8884
-        ? `wss://${host}:${port}/mqtt`
-        : (port === 8083 ? `ws://${host}:${port}/mqtt` : `ws://${host}:${port}/mqtt`);
-
-      console.log('[MQTT] 正在连接', wsUrl);
-
-      return new Promise((resolve) => {
-        try {
-          // mqtt.js 全局函数 mqtt.connect(url, options)
-          _client = mqtt.connect(wsUrl, {
-            clientId: 'web_' + Date.now().toString(36),
-            keepalive: 30,
-            clean: true,
-            username: opts.username || undefined,
-            password: opts.password || undefined,
-            will: deviceId ? {
-              topic: `device/${deviceId}/status`,
-              payload: JSON.stringify({ online: false }),
-              qos: 1,
-              retain: false,
-            } : undefined,
-            connectTimeout: 5000,
-            reconnectPeriod: 0,  // 我们自己管理重连
-          });
-
-          _client.on('connect', () => {
-            _connected = true;
-            _reconnectAttempts = 0;
-            console.log('[MQTT] ✅ 已连接');
-            _subscribeDeviceTopics();
-            // 通知所有监听者
-            _notifyState('connected');
-            resolve(true);
-          });
-
-          _client.on('message', (topic, message) => {
-            try {
-              const payload = JSON.parse(message.toString());
-              console.log('[MQTT] 📥', topic, payload);
-
-              // 分发给匹配的处理器
-              for (const h of _handlers) {
-                if (h.fn && matchTopic(h.topic, topic)) {
-                  h.fn(topic, payload);
-                }
-              }
-
-              // 全局消息事件
-              window.dispatchEvent(new CustomEvent('mqtt-message', {
-                detail: { topic, payload },
-              }));
-            } catch (e) {
-              console.warn('[MQTT] 消息解析失败:', topic, e);
-            }
-          });
-
-          _client.on('error', (err) => {
-            console.error('[MQTT] ❌ 错误:', err.message || err);
-            _connected = false;
-            _notifyState('error');
-          });
-
-          _client.on('close', () => {
-            _connected = false;
-            console.log('[MQTT] 连接关闭');
-            _notifyState('disconnected');
-            _scheduleReconnect(host, port, deviceId, opts);
-          });
-
-          _client.on('offline', () => {
-            _connected = false;
-            console.log('[MQTT] 离线');
-            _notifyState('disconnected');
-          });
-
-          // 连接超时
-          setTimeout(() => {
-            if (!_connected) {
-              console.warn('[MQTT] 连接超时');
-              resolve(false);
-            }
-          }, 6000);
-
-        } catch (e) {
-          console.error('[MQTT] 连接异常:', e);
-          _connected = false;
-          resolve(false);
-        }
-      });
-    },
-
-    /** 断开连接 */
-    async disconnect() {
-      _reconnectTimer && clearTimeout(_reconnectTimer);
-      _reconnectTimer = null;
-      if (_client) {
-        try {
-          _client.end(true);
-        } catch (_) {}
-        _client = null;
-      }
-      _connected = false;
-      _notifyState('disconnected');
-      console.log('[MQTT] 已断开');
-    },
-
-    /**
-     * 订阅主题
-     * @param {string} topic - 支持通配符 + (单层) # (多层)
-     * @param {Function} fn - 回调 (topic, payload) => {}
-     */
-    subscribe(topic, fn) {
-      if (_client && _connected) {
-        _client.subscribe(topic, { qos: 1 }, (err) => {
-          if (err) {
-            console.warn('[MQTT] 订阅失败:', topic, err);
-          } else {
-            console.log('[MQTT] 已订阅:', topic);
-          }
-        });
-      }
-      // 即使当前未连接也记录处理器，重连后重新订阅
-      _handlers.push({ topic, fn });
-    },
-
-    /**
-     * 取消订阅
-     * @param {string} topic
-     * @param {Function} [fn] - 如果提供，只移除该回调
-     */
-    unsubscribe(topic, fn) {
-      if (fn) {
-        _handlers = _handlers.filter(h => !(h.topic === topic && h.fn === fn));
-      } else {
-        _handlers = _handlers.filter(h => h.topic !== topic);
-      }
-      if (_client && _connected) {
-        _client.unsubscribe(topic);
-      }
-    },
-
-    /**
-     * 发布消息
-     * @param {string} topic
-     * @param {Object} payload
-     * @param {Object} [opts] - { qos, retain }
-     */
-    publish(topic, payload, opts = {}) {
-      if (!_client || !_connected) {
-        console.warn('[MQTT] ⚠️ 未连接，无法发布到', topic);
-        return false;
-      }
-      const msg = JSON.stringify(payload);
-      _client.publish(topic, msg, {
-        qos: opts.qos || 1,
-        retain: opts.retain || false,
-      });
-      console.log('[MQTT] 📤', topic, payload);
-      return true;
-    },
-
-    // --- 业务快捷方法 ---
-
-    /** 发布设备发现广播 */
-    publishDiscover() {
-      return this.publish(DISCOVER_TOPIC, {
-        from: 'web_client',
-        timestamp: new Date().toISOString(),
-      });
-    },
-
-    /** 发布任务添加 */
-    publishTaskAdd(task) {
-      return this.publish(`device/${_deviceId}/task/add`, task);
-    },
-
-    /** 发布任务完成状态 */
-    publishTaskDone(taskId, done) {
-      return this.publish(`device/${_deviceId}/task/done`, {
-        task_id: taskId,
-        done: done,
-        timestamp: new Date().toISOString(),
-      });
-    },
-
-    /** 推送消息到设备 */
-    publishChatMessage(content) {
-      return this.publish(`device/${_deviceId}/message/chat`, {
-        content: content,
-        timestamp: new Date().toISOString(),
-      });
-    },
-
-    /** 发布番茄钟控制 */
-    publishPomodoro(action) {
-      return this.publish(`device/${_deviceId}/pomodoro/start`, {
-        action: action,
-        timestamp: new Date().toISOString(),
-      });
-    },
-
-    /** 更新设备 ID */
-    async setDeviceId(newId) {
-      if (newId === _deviceId) return;
-      // 取消旧订阅
-      if (_deviceId && _client && _connected) {
-        _client.unsubscribe(`device/${_deviceId}/#`);
-      }
-      _deviceId = newId;
-      // 重新订阅
-      await _subscribeDeviceTopics();
-    },
-
-    /** 获取发现的所有设备 */
-    getDiscoveredDevices() {
-      return _discoveredDevices;
-    },
-
-    /** 开始设备发现扫描 */
-    startDiscovery(onDeviceFound) {
-      _discoveredDevices = [];
-      _discoveryCallback = onDeviceFound;
-
-      // 订阅所有设备的 discover/ack
-      this.subscribe('device/+/discover/ack', (topic, payload) => {
-        const device = {
-          id: payload.id || '',
-          name: payload.name || '未知设备',
-          ip: payload.ip || '',
-          battery: payload.battery || 0,
-          online: payload.online || false,
-          state: payload.state || 'idle',
-          petMood: payload.pet_mood || 'happy',
-          version: payload.version || '',
-        };
-
-        if (!device.id) return;
-
-        // 去重
-        const existingIdx = _discoveredDevices.findIndex(d => d.id === device.id);
-        if (existingIdx >= 0) {
-          _discoveredDevices[existingIdx] = device;
-        } else {
-          _discoveredDevices.push(device);
-        }
-
-        // 按电量排序
-        _discoveredDevices.sort((a, b) => b.battery - a.battery);
-
-        if (_discoveryCallback) {
-          _discoveryCallback(_discoveredDevices);
-        }
-      });
-
-      // 发送广播
-      this.publishDiscover();
-
-      // 5 秒后自动停止
-      _discoveryTimer && clearTimeout(_discoveryTimer);
-      _discoveryTimer = setTimeout(() => {
-        this.stopDiscovery();
-      }, 5000);
-
-      return true;
-    },
-
-    /** 停止设备发现 */
-    stopDiscovery() {
-      _discoveryTimer && clearTimeout(_discoveryTimer);
-      this.unsubscribe('device/+/discover/ack');
-      console.log('[MQTT] 设备发现结束，共发现', _discoveredDevices.length, '台');
-    },
-
-    /** 重置 */
-    reset() {
-      _handlers = [];
-      _discoveredDevices = [];
-      _deviceId = '';
-      this.disconnect();
-    },
+  // 主题（和 ESP32 固件保持一致）
+  var TOPIC = {
+    STATUS:   'desk/island/status',    // ESP32 → 网页：设备状态上报
+    DISPLAY:  'desk/island/display',   // 网页 → ESP32：OLED 显示内容
+    CMD:      'desk/island/cmd',       // 网页 → ESP32：控制指令
+    TASK_ADD: 'desk/island/task/add',  // 网页 → ESP32：添加任务
+    TASK_DONE:'desk/island/task/done', // 网页 → ESP32：任务完成
+    POMODORO: 'desk/island/pomodoro',  // 网页 → ESP32：番茄钟控制
+    CHAT:     'desk/island/chat',      // 网页 → ESP32：对话推送
   };
 
-  // ========== 内部函数 ==========
+  // ==================== 内部 ====================
 
-  let _discoveredDevices = [];
-  let _discoveryCallback = null;
-  let _discoveryTimer = null;
-
-  /** 订阅当前设备的所有主题 */
-  async function _subscribeDeviceTopics() {
-    if (!_client || !_connected || !_deviceId) return;
-
-    const topics = [
-      `device/${_deviceId}/status`,
-      `device/${_deviceId}/task/list`,
-      `device/${_deviceId}/task/done`,
-      `device/${_deviceId}/pomodoro/status`,
-      `device/${_deviceId}/chat/history`,
-      `device/${_deviceId}/discover/ack`,
-    ];
-
-    for (const topic of topics) {
-      _client.subscribe(topic, { qos: 1 }, (err) => {
-        if (err) console.warn('[MQTT] 订阅失败:', topic, err);
-        else console.log('[MQTT] 已订阅:', topic);
-      });
-    }
-
-    // 也订阅广播发现应答
-    _client.subscribe('device/+/discover/ack', { qos: 1 }, (err) => {
-      if (!err) console.log('[MQTT] 已订阅: 设备发现应答');
-    });
-  }
-
-  /** 简单主题匹配（支持 + 单层通配，# 多层通配） */
-  function matchTopic(pattern, topic) {
-    const regexStr = pattern
-      .replace(/[.+^${}()|[\]\\]/g, '\\$&')  // 转义特殊字符
-      .replace(/\\\+/g, '[^/]+')              // + → 单层
-      .replace(/#/g, '.*');                   // # → 多层
-    return new RegExp('^' + regexStr + '$').test(topic);
-  }
-
-  /** 通知状态变化 */
-  function _notifyState(state) {
+  function _notify(state) {
     window.dispatchEvent(new CustomEvent('mqtt-state', {
-      detail: { state, deviceId: _deviceId },
+      detail: { state: state, connected: _connected, deviceOnline: _deviceOnline },
     }));
   }
 
-  /** 自动重连 */
-  function _scheduleReconnect(host, port, deviceId, opts) {
-    if (_reconnectTimer) return;
-    const delay = Math.min(
-      (_reconnectAttempts < 5 ? Math.pow(2, _reconnectAttempts) : 30) * 1000,
-      30000
-    );
-    _reconnectAttempts++;
-    console.log(`[MQTT] 🔄 ${delay / 1000}s 后重连 (第 ${_reconnectAttempts} 次)`);
+  function _doConnect() {
+    if (typeof mqtt === 'undefined') {
+      console.error('[MQTT] mqtt.js 未加载，2s 后重试');
+      setTimeout(_doConnect, 2000);
+      return;
+    }
 
-    _reconnectTimer = setTimeout(async () => {
-      _reconnectTimer = null;
-      await MqttClient.connect({ host, port, deviceId, ...opts });
-    }, delay);
+    if (_client) { try { _client.end(true); } catch (_) {} }
+
+    var url = 'ws://' + _host + ':' + _port;
+    console.log('[MQTT] 连接', url);
+
+    _client = mqtt.connect(url, {
+      clientId: 'web-' + Math.random().toString(16).slice(2, 10),
+      clean: true,
+      connectTimeout: 6000,
+      reconnectPeriod: 0,
+    });
+
+    _client.on('connect', function() {
+      _connected = true;
+      console.log('[MQTT] ✅ 已连接');
+      // 订阅 ESP32 上报
+      _client.subscribe('desk/island/status', { qos: 1 });
+      _client.subscribe('desk/island/#', { qos: 1 });
+      _notify('connected');
+    });
+
+    _client.on('message', function(topic, message) {
+      var payload;
+      try { payload = JSON.parse(message.toString()); } catch (_) { return; }
+
+      console.log('[MQTT] 📥', topic, payload);
+
+      // ESP32 上报状态 → 标记设备在线
+      if (topic === TOPIC.STATUS) {
+        if (payload.online !== undefined) _deviceOnline = payload.online;
+        else _deviceOnline = true; // 发了消息就说明在线
+        _notify('device_online');
+      }
+
+      window.dispatchEvent(new CustomEvent('mqtt-message', {
+        detail: { topic: topic, payload: payload },
+      }));
+    });
+
+    _client.on('error', function(err) {
+      _connected = false;
+      console.warn('[MQTT] 错误:', err.message);
+      _notify('error');
+    });
+
+    _client.on('close', function() {
+      _connected = false;
+      _notify('disconnected');
+      // 5 秒后重连
+      setTimeout(_doConnect, 5000);
+    });
   }
+
+  // ==================== 公开 API ====================
+
+  return {
+
+    get connected() { return _connected; },
+    get deviceOnline() { return _deviceOnline; },
+
+    /** 修改 Broker 地址并重连 */
+    setBroker: function(host, port) {
+      _host = host;
+      _port = port;
+      localStorage.setItem('mqtt_host', host);
+      localStorage.setItem('mqtt_port', String(port));
+      if (_client) { try { _client.end(true); } catch (_) {} _client = null; }
+      _connected = false;
+      _doConnect();
+    },
+
+    /** 启动 */
+    autoConnect: function() {
+      var h = localStorage.getItem('mqtt_host');
+      var p = localStorage.getItem('mqtt_port');
+      if (h) _host = h;
+      if (p) _port = parseInt(p) || 8083;
+      _doConnect();
+    },
+
+    /** 发送到 ESP32 显示屏 */
+    display: function(json) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.DISPLAY, JSON.stringify(json), { qos: 1 });
+      console.log('[MQTT] 📤', TOPIC.DISPLAY, json);
+      return true;
+    },
+
+    /** 发送控制指令 */
+    cmd: function(json) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.CMD, JSON.stringify(json), { qos: 1 });
+      console.log('[MQTT] 📤', TOPIC.CMD, json);
+      return true;
+    },
+
+    /** 发布任务 */
+    taskAdd: function(task) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.TASK_ADD, JSON.stringify(task), { qos: 1 });
+      return true;
+    },
+
+    taskDone: function(taskId, done) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.TASK_DONE, JSON.stringify({ task_id: taskId, done: done }), { qos: 1 });
+      return true;
+    },
+
+    /** 发布番茄钟 */
+    pomodoro: function(action) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.POMODORO, JSON.stringify({ action: action }), { qos: 1 });
+      return true;
+    },
+
+    /** 推送对话 */
+    chat: function(content) {
+      if (!_connected) return false;
+      _client.publish(TOPIC.CHAT, JSON.stringify({ content: content }), { qos: 1 });
+      return true;
+    },
+  };
+
 })();
 
-console.log('🐕 MQTT 客户端已就绪 (WebSocket)');
+console.log('🐕 MQTT 就绪  Mosquitto ws://localhost:8083  desk/island/#');

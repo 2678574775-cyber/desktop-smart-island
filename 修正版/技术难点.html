@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, initial-scale=1.0">
+<title>桌面智能灵动岛 — 技术难点</title>
+<style>
+  :root { --bg:#1A1A2E; --card:#25253D; --accent:#00D2FF; --white:#FFF; --gray:#AAA;
+          --green:#2ECC71; --orange:#FF9F43; --red:#FF6B6B; --purple:#A855F7; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--white); font-family:'Microsoft YaHei',sans-serif; padding:40px 50px; }
+  h1 { text-align:center; color:var(--accent); font-size:36px; margin-bottom:8px; }
+  .sub { text-align:center; color:var(--gray); font-size:16px; margin-bottom:40px; }
+
+  .grid { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+  .card { background:var(--card); border-radius:14px; overflow:hidden; width:600px; min-height:340px; }
+  .card-header { padding:18px 22px; font-size:20px; font-weight:bold; display:flex; align-items:center; gap:10px; }
+  .card-header .num { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--bg); font-weight:bold; flex-shrink:0; }
+  .card-body { padding:0 22px 22px; font-size:14px; line-height:1.9; }
+
+  .c1 .num { background:var(--red); }       .c1 .card-header { color:var(--red); }
+  .c2 .num { background:var(--orange); }     .c2 .card-header { color:var(--orange); }
+  .c3 .num { background:var(--purple); }     .c3 .card-header { color:var(--purple); }
+  .c4 .num { background:var(--gray); }       .c4 .card-header { color:#999; }
+
+  .tag { display:inline-block; padding:1px 8px; border-radius:4px; font-size:12px; font-weight:bold; margin-right:4px; }
+  .tag-r { background:rgba(255,107,107,0.15); color:var(--red); }
+  .tag-o { background:rgba(255,159,67,0.15); color:var(--orange); }
+  .tag-g { background:rgba(46,204,113,0.15); color:var(--green); }
+  .tag-p { background:rgba(168,85,247,0.15); color:var(--purple); }
+  .tag-a { background:rgba(0,210,255,0.15); color:var(--accent); }
+
+  .arrow { color:var(--gray); margin:0 4px; }
+  .highlight { color:var(--accent); font-weight:bold; }
+
+  .phase-bar { display:flex; align-items:center; gap:6px; margin:8px 0; font-size:13px; flex-wrap:wrap; }
+  .phase { background:rgba(255,255,255,0.06); border-radius:6px; padding:4px 10px; text-align:center; }
+  .phase.done { color:var(--green); }
+  .phase.fail { color:var(--red); text-decoration:line-through; }
+  .phase.cur  { border:1px solid var(--accent); color:var(--accent); }
+
+  .code-block { background:rgba(0,0,0,0.3); border-radius:6px; padding:10px 14px; font-family:'Cascadia Code','Consolas',monospace; font-size:12px; line-height:1.6; margin:6px 0; overflow-x:auto; white-space:pre; color:var(--accent); }
+  .code-block .c { color:var(--gray); }
+
+  hr { border:none; border-top:1px solid rgba(255,255,255,0.08); margin:18px 0; }
+
+  .flow-inline { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:13px; margin:8px 0; }
+  .flow-node { background:rgba(255,255,255,0.05); border-radius:6px; padding:5px 10px; white-space:nowrap; }
+
+  @media print { body { padding:20px; } }
+</style>
+</head>
+<body>
+
+<h1>关键技术难点与解决方案</h1>
+<p class="sub">桌面智能灵动岛 · 答辩资料</p>
+
+<div class="grid">
+
+  <!-- 难点一 -->
+  <div class="card c1">
+    <div class="card-header"><span class="num">1</span> GPIO 引脚资源极度紧缺</div>
+    <div class="card-body">
+
+      <div class="phase-bar">
+        <span class="phase fail">6 键 + LED</span> <span class="arrow">→</span>
+        <span class="phase fail">HC138 焊接损坏</span> <span class="arrow">→</span>
+        <span class="phase fail">5 键 无 LED</span> <span class="arrow">→</span>
+        <span class="phase fail">GPIO0 物理损坏</span> <span class="arrow">→</span>
+        <span class="phase cur">最终 4 键</span>
+      </div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:12px;">
+        退化路径：每次硬件事故损失 1-2 个按键，代码跟着退化
+      </div>
+
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;">
+          <div style="color:var(--red);font-size:13px;font-weight:bold;margin-bottom:4px;">✕ 尝试：74HC138 3-8译码器</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+            3 地址线 + 1 读回线 = 4 GPIO 驱动 6 键<br>
+            诊断代码：test/hc138_diag/ 轮询地址码<br>
+            <span class="tag tag-r">失败</span> 焊接问题致芯片损坏，时间紧放弃
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="color:var(--green);font-size:13px;font-weight:bold;margin-bottom:4px;">✓ 最终：4 键多用</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+            <span class="highlight">D 键</span> (GPIO1)：短按切模式 · 双击配对 · 长按进设置<br>
+            <span class="highlight">A 键</span> (GPIO2)：CHAT-ROBOT 长按录音 · COUNTDOWN 短按 -5min<br>
+            <span class="highlight">GPIO0</span> 损坏 → 改为电池 ADC 分压检测
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block"><span class="c">// config.h — 最终 4 键配置</span>
+#define KEY_PIN_A  2  <span class="c">// ⚠ Strapping 引脚</span>
+#define KEY_PIN_B  4
+#define KEY_PIN_C  3
+#define KEY_PIN_D  1
+#define BATT_ADC_PIN  0  <span class="c">// 原按键 E，已损坏 → 改 ADC</span>
+#define LED_PIN   -1     <span class="c">// 直接放弃 LED</span></div>
+    </div>
+  </div>
+
+  <!-- 难点二 -->
+  <div class="card c2">
+    <div class="card-header"><span class="num">2</span> 语音全链路 · 两代架构演进</div>
+    <div class="card-body">
+
+      <div style="margin-bottom:12px;">
+        <span class="tag tag-r">第一代</span>
+        <span style="font-size:13px;">ESP32 直连智谱 AI → OLED</span>
+        <div style="font-size:12px;color:var(--gray);margin-top:4px;">
+          ai_service.cpp 限制回复「5 个英文单词」→ "OK" / "I don't know" → 无信息量<br>
+          为什么？OLED 128×64 内容区仅 48px 高，不加限制 AI 回复溢出屏幕
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <span class="tag tag-g">第二代</span>
+        <span style="font-size:13px;">ESP32 → MQTT → Web DeepSeek Agent → MQTT → ESP32</span>
+        <div style="font-size:12px;color:var(--gray);margin-top:4px;">
+          agent.js：think → tool_call → observe 多轮推理 + 8 Function Calling 工具<br>
+          回复质量大幅提升，但延迟 7-12s，ESP32 端 15s 超时偶尔被截断
+        </div>
+      </div>
+
+      <div style="color:var(--accent);font-size:13px;font-weight:bold;">核心创新：流式 base64 编码</div>
+      <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">
+        ESP32-C3 仅 400KB RAM，无法一次性构建 128KB 的 WAV+base64 JSON body<br>
+        → <span class="highlight">streamBase64Concat()</span>：WAV头+PCM → 480B 分块 → 边编码边 HTTPS 发送<br>
+        WAV头与PCM必须作为连续流处理，否则中间产生错误'='填充符 → API 解析失败
+      </div>
+
+      <div class="flow-inline">
+        <span style="color:var(--gray);font-size:12px;">延迟拆解：</span>
+        <span class="flow-node">录音 2s</span> →
+        <span class="flow-node">base64<br>~0.2s</span> →
+        <span class="flow-node">TLS 握手<br>0.3-0.8s</span> →
+        <span class="flow-node">上传<br>0.5-2s</span> →
+        <span class="flow-node">ASR<br>0.3-1.5s</span> →
+        <span class="flow-node">Agent<br>2-8s</span>
+        <span style="font-size:12px;color:var(--orange);margin-left:4px;">总 7-12s</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 难点三 -->
+  <div class="card c3">
+    <div class="card-header"><span class="num">3</span> MQTT 通信：阻塞重连 + Broker IP 硬编码</div>
+    <div class="card-body">
+
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;">
+          <div style="color:var(--purple);font-size:13px;font-weight:bold;">问题一：同步阻塞</div>
+          <div class="code-block">PubSubClient.connect()  <span class="c">← 同步阻塞！</span>
+Broker 不可达时 TCP 超时数秒
+→ 主循环完全卡死
+→ 按键/OLED/倒计时/看门狗停摆</div>
+          <div style="font-size:12px;color:var(--gray);">
+            ESP32-C3 <span class="highlight">单核</span> RISC-V，无法 xTaskCreatePinnedToCore<br>
+            当前缓解：5s 冷却窗口 + 已连接时 loop() 非阻塞
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="color:var(--purple);font-size:13px;font-weight:bold;">问题二：IP 硬编码</div>
+          <div class="code-block"><span class="c">// config.h:77</span>
+#define MQTT_BROKER_IP "172.21.1.146"</div>
+          <div style="font-size:12px;color:var(--gray);">
+            PC DHCP 换 IP → Broker 不可达<br>
+            → 每 5s 触发阻塞重连<br>
+            → 用户感觉"设备一直在找 MQTT"
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div style="color:var(--green);font-size:13px;font-weight:bold;">解法</div>
+      <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+        <span class="tag tag-g">最快补救</span> Broker IP 存入 NVS Flash (Preferences)，OLED 交互式输入，无需重新烧录<br>
+        <span class="tag tag-g">根治</span> 换 AsyncMQTTClient (回调非阻塞，不影响主循环) 或 FreeRTOS 任务隔离 MQTT
+      </div>
+    </div>
+  </div>
+
+  <!-- 难点四 -->
+  <div class="card c4">
+    <div class="card-header"><span class="num">4</span> Flutter APK 构建失败 → Web 方案退守</div>
+    <div class="card-body">
+
+      <div style="font-size:13px;color:#999;font-weight:bold;margin-bottom:8px;">flutter build apk 的完整依赖链</div>
+      <div class="flow-inline" style="font-size:11px;color:var(--gray);">
+        <span class="flow-node">Gradle<br>发行版</span> →
+        <span class="flow-node">Gradle<br>插件</span> →
+        <span class="flow-node">Maven<br>依赖</span> →
+        <span class="flow-node">Android<br>SDK</span> →
+        <span class="flow-node">Kotlin<br>插件</span> →
+        <span class="flow-node">Dart<br>pub 包</span> →
+        <span class="flow-node">Flutter<br>引擎</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray);margin:8px 0;">
+        配置了所有常用国内镜像（阿里云/腾讯云/Flutter镜像 + Clash 代理 127.0.0.1:7890）<br>
+        但镜像无法覆盖全部环节：<span class="highlight">pub.dev</span>、<span class="highlight">dl.google.com</span>、部分 Kotlin 插件仍然不可达<br>
+        .gradle/ 下 8.6 / 8.9 / 9.1.0 / 8.14 四个版本目录 → 反复调版本兼容性
+      </div>
+
+      <hr>
+
+      <div style="display:flex;gap:16px;">
+        <div style="flex:1;">
+          <div style="color:var(--orange);font-size:13px;font-weight:bold;">退守 Web SPA</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+            Flutter 25 文件 ~2500 行 UI 已完整<br>
+            浏览器即运行时，无需任何构建工具链<br>
+            Cloudflare Pages：<span class="highlight">desktoppet.pages.dev</span><br>
+            Cloudflare Workers：搜索代理 + ASR 代理<br>
+            演示用本地 Live Server（Cloudflare 国内慢）
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="color:var(--accent);font-size:13px;font-weight:bold;">未来路径</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7;">
+            <span class="tag tag-a">PWA</span> manifest.json + Service Worker<br>
+            现有 Web 代码直接转为"可安装"应用<br>
+            无需 Flutter 构建链，0 额外依赖
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
